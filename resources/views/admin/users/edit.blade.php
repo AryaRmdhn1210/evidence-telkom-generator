@@ -20,6 +20,13 @@
                     </div>
 
                     <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700">Username</label>
+                        <input type="text" name="username" value="{{ old('username', $user->username) }}"
+                            class="block w-full mt-1 border-gray-300 rounded">
+                        @error('username') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700">Email</label>
                         <input type="email" name="email" value="{{ old('email', $user->email) }}"
                             class="block w-full mt-1 border-gray-300 rounded">
