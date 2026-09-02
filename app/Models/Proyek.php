@@ -22,6 +22,12 @@ class Proyek extends Model
         'sto',
         'pelaksana',
         'dibuat_oleh',
+        'nama_tim_uji_terima',
+        'nik_tim_uji_terima',
+        'ttd_tim_uji_terima',
+        'nama_pelaksana_ttd',
+        'nik_pelaksana_ttd',
+        'ttd_pelaksana',
     ];
 
     public function pembuat(): BelongsTo

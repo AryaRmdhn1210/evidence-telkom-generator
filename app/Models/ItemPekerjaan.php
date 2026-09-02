@@ -15,6 +15,7 @@ class ItemPekerjaan extends Model
     protected $fillable = [
         'kode_designator',
         'uraian_pekerjaan',
+        'kategori_pekerjaan',
         'satuan',
         'kategori_foto_default',
         'is_master',
