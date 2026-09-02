@@ -21,6 +21,10 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::resource('proyek', ProyekController::class)->middleware('auth');
+    Route::get('/proyek/{proyek}/review', [ProyekController::class, 'review'])->name('proyek.review');
+    Route::get('/proyek/{proyek}/generate', [ProyekController::class, 'generate'])->name('proyek.generate');
+    Route::post('/proyek/{proyek}/generate', [ProyekController::class, 'generateStore'])->name('proyek.generate.store');
+    Route::delete('/proyek/{proyek}/laporan/{laporan}', [ProyekController::class, 'destroyLaporan'])->name('proyek.laporan.destroy');
 
     Route::prefix('proyek/{proyek}/item')->name('proyek.item.')->group(function () {
         Route::get('/create', [ItemProyekController::class, 'create'])->name('create');

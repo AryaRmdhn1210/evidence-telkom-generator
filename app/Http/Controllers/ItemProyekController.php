@@ -23,7 +23,8 @@ class ItemProyekController extends Controller
     $validated = $request->validate([
       'mode' => ['required', 'in:existing,baru'],
       'item_pekerjaan_id' => ['required_if:mode,existing', 'nullable', 'exists:item_pekerjaan,id'],
-      'kode_designator' => ['required_if:mode,baru', 'nullable', 'string', 'max:255'],
+      'kode_designator' => ['required_if:mode,baru', 'nullable', 'string', 'max:255', 'unique:item_pekerjaan,kode_designator'],
+      'kategori_pekerjaan' => ['nullable', 'string', 'max:255'],
       'uraian_pekerjaan' => ['required_if:mode,baru', 'nullable', 'string', 'max:255'],
       'satuan' => ['required_if:mode,baru', 'nullable', 'string', 'max:50'],
       'qty_drm' => ['required', 'integer', 'min:0'],
@@ -37,6 +38,7 @@ class ItemProyekController extends Controller
       $itemPekerjaan = ItemPekerjaan::create([
         'kode_designator' => $validated['kode_designator'],
         'uraian_pekerjaan' => $validated['uraian_pekerjaan'],
+        'kategori_pekerjaan' => $validated['kategori_pekerjaan'] ?? null,
         'satuan' => $validated['satuan'],
         'is_master' => false,
       ]);
@@ -97,6 +99,10 @@ class ItemProyekController extends Controller
 
   public function destroyFoto(Proyek $proyek, ItemProyek $itemProyek, FotoBukti $foto)
   {
+    if ($foto->item_proyek_id !== $itemProyek->id) {
+      abort(404);
+    }
+
     Storage::disk('public')->delete($foto->file_path);
     $foto->delete();
 

@@ -21,6 +21,12 @@ class ProyekRequest extends FormRequest
             'lokasi' => ['nullable', 'string', 'max:255'],
             'sto' => ['nullable', 'string', 'max:255'],
             'pelaksana' => ['nullable', 'string', 'max:255'],
+            'nama_tim_uji_terima' => ['nullable', 'string', 'max:255'],
+            'nik_tim_uji_terima' => ['nullable', 'string', 'max:50'],
+            'ttd_tim_uji_terima' => ['nullable', 'image', 'max:2048'],
+            'nama_pelaksana_ttd' => ['nullable', 'string', 'max:255'],
+            'nik_pelaksana_ttd' => ['nullable', 'string', 'max:50'],
+            'ttd_pelaksana' => ['nullable', 'image', 'max:2048'],
         ];
     }
 }

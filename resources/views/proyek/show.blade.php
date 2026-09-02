@@ -1,18 +1,18 @@
 <x-app-layout>
   <x-slot name="header">
-    <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+    <h2 class="text-xl font-semibold leading-tight text-gray-800">
       {{ $proyek->nama_proyek }}
     </h2>
   </x-slot>
 
   <div class="py-8">
-    <div class="max-w-5xl mx-auto sm:px-6 lg:px-8 space-y-6">
+    <div class="max-w-5xl mx-auto space-y-6 sm:px-6 lg:px-8">
 
       @if (session('status'))
-      <div class="p-3 bg-green-100 text-green-700 rounded">{{ session('status') }}</div>
+      <div class="p-3 text-green-700 bg-green-100 rounded">{{ session('status') }}</div>
       @endif
 
-      <div class="bg-white shadow rounded p-6">
+      <div class="p-6 bg-white rounded shadow">
         <dl class="grid grid-cols-2 gap-4 text-sm">
           <div>
             <dt class="text-gray-500">No Kontrak</dt>
@@ -37,18 +37,19 @@
         </dl>
       </div>
 
-      <div class="flex justify-between items-center">
+      <div class="flex items-center justify-between">
         <h3 class="font-semibold text-gray-700">Item Pekerjaan</h3>
         <a href="{{ route('proyek.item.create', $proyek) }}"
-          class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-sm">
+          class="px-4 py-2 text-sm text-white bg-red-600 rounded hover:bg-red-700">
           + Tambah Item
         </a>
       </div>
 
-      <div class="bg-white shadow rounded overflow-hidden">
+      <div class="overflow-hidden bg-white rounded shadow">
         <table class="w-full text-sm text-left">
-          <thead class="bg-gray-50 text-gray-600">
+          <thead class="text-gray-600 bg-gray-50">
             <tr>
+              <th class="px-4 py-3">Kode Designator</th>
               <th class="px-4 py-3">Item</th>
               <th class="px-4 py-3">Satuan</th>
               <th class="px-4 py-3">Rekon/Aktual</th>
@@ -60,6 +61,7 @@
           <tbody>
             @forelse ($proyek->itemProyek as $item)
             <tr class="border-t">
+              <td class="px-4 py-3 font-mono text-xs">{{ $item->itemPekerjaan->kode_designator }}</td>
               <td class="px-4 py-3">{{ $item->itemPekerjaan->uraian_pekerjaan }}</td>
               <td class="px-4 py-3">{{ $item->itemPekerjaan->satuan }}</td>
               <td class="px-4 py-3">{{ $item->qty_rekon_aktual }}</td>
@@ -70,11 +72,11 @@
               </td>
               <td class="px-4 py-3">
                 @if ($item->status_lengkap)
-                <span class="text-xs px-2 py-1 rounded bg-green-100 text-green-700">
+                <span class="px-2 py-1 text-xs text-green-700 bg-green-100 rounded">
                   Lengkap ({{ $item->fotoBukti->count() }}/{{ $item->jumlah_foto_wajib }})
                 </span>
                 @else
-                <span class="text-xs px-2 py-1 rounded bg-yellow-100 text-yellow-700">
+                <span class="px-2 py-1 text-xs text-yellow-700 bg-yellow-100 rounded">
                   Kurang {{ $item->jumlah_foto_wajib - $item->fotoBukti->count() }} ({{ $item->fotoBukti->count() }}/{{ $item->jumlah_foto_wajib }})
                 </span>
                 @endif
@@ -91,13 +93,20 @@
             </tr>
             @empty
             <tr>
-              <td colspan="6" class="px-4 py-6 text-center text-gray-500">
+              <td colspan="7" class="px-4 py-6 text-center text-gray-500">
                 Belum ada item. Klik "+ Tambah Item" untuk mulai.
               </td>
             </tr>
             @endforelse
           </tbody>
         </table>
+      </div>
+
+      <div class="flex justify-end">
+        <a href="{{ route('proyek.review', $proyek) }}"
+          class="px-4 py-2 text-sm text-white bg-red-600 rounded hover:bg-red-700">
+          Review Laporan →
+        </a>
       </div>
 
     </div>
