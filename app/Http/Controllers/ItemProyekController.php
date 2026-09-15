@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\FotoBukti;
-use App\Models\ItemPekerjaan;
+use App\Models\KatalogItem;
 use App\Models\ItemProyek;
 use App\Models\Proyek;
 use Illuminate\Http\Request;
@@ -13,17 +13,17 @@ class ItemProyekController extends Controller
 {
   public function create(Proyek $proyek)
   {
-    $itemPekerjaans = ItemPekerjaan::orderBy('uraian_pekerjaan')->get();
+    $katalogItems = KatalogItem::orderBy('uraian_pekerjaan')->get();
 
-    return view('proyek.item.create', compact('proyek', 'itemPekerjaans'));
+    return view('proyek.item.create', compact('proyek', 'katalogItems'));
   }
 
   public function store(Request $request, Proyek $proyek)
   {
     $validated = $request->validate([
       'mode' => ['required', 'in:existing,baru'],
-      'item_pekerjaan_id' => ['required_if:mode,existing', 'nullable', 'exists:item_pekerjaan,id'],
-      'kode_designator' => ['required_if:mode,baru', 'nullable', 'string', 'max:255', 'unique:item_pekerjaan,kode_designator'],
+      'katalog_item_id' => ['required_if:mode,existing', 'nullable', 'exists:katalog_item,id'],
+      'kode_designator' => ['required_if:mode,baru', 'nullable', 'string', 'max:255', 'unique:katalog_item,kode_designator'],
       'kategori_pekerjaan' => ['nullable', 'string', 'max:255'],
       'uraian_pekerjaan' => ['required_if:mode,baru', 'nullable', 'string', 'max:255'],
       'satuan' => ['required_if:mode,baru', 'nullable', 'string', 'max:50'],
@@ -35,22 +35,22 @@ class ItemProyekController extends Controller
     ]);
 
     if ($validated['mode'] === 'baru') {
-      $itemPekerjaan = ItemPekerjaan::create([
+      $katalogItem = KatalogItem::create([
         'kode_designator' => $validated['kode_designator'],
         'uraian_pekerjaan' => $validated['uraian_pekerjaan'],
         'kategori_pekerjaan' => $validated['kategori_pekerjaan'] ?? null,
         'satuan' => $validated['satuan'],
         'is_master' => false,
       ]);
-      $itemPekerjaanId = $itemPekerjaan->id;
+      $katalogItemId = $katalogItem->id;
     } else {
-      $itemPekerjaanId = $validated['item_pekerjaan_id'];
+      $katalogItemId = $validated['katalog_item_id'];
     }
 
     $urutan = $proyek->itemProyek()->count() + 1;
 
     $itemProyek = $proyek->itemProyek()->create([
-      'item_pekerjaan_id' => $itemPekerjaanId,
+      'katalog_item_id' => $katalogItemId,
       'qty_drm' => $validated['qty_drm'],
       'qty_rekon_aktual' => $validated['qty_rekon_aktual'],
       'qty_tambah' => $validated['qty_tambah'],
@@ -65,7 +65,7 @@ class ItemProyekController extends Controller
 
   public function upload(Proyek $proyek, ItemProyek $itemProyek)
   {
-    $itemProyek->load('itemPekerjaan', 'fotoBukti');
+    $itemProyek->load('katalogItem', 'fotoBukti');
 
     return view('proyek.item.upload', compact('proyek', 'itemProyek'));
   }

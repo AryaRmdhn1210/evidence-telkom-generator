@@ -61,9 +61,9 @@
           <tbody>
             @forelse ($proyek->itemProyek as $item)
             <tr class="border-t">
-              <td class="px-4 py-3 font-mono text-xs">{{ $item->itemPekerjaan->kode_designator }}</td>
-              <td class="px-4 py-3">{{ $item->itemPekerjaan->uraian_pekerjaan }}</td>
-              <td class="px-4 py-3">{{ $item->itemPekerjaan->satuan }}</td>
+              <td class="px-4 py-3 font-mono text-xs">{{ $item->katalogItem->kode_designator }}</td>
+              <td class="px-4 py-3">{{ $item->katalogItem->uraian_pekerjaan }}</td>
+              <td class="px-4 py-3">{{ $item->katalogItem->satuan }}</td>
               <td class="px-4 py-3">{{ $item->qty_rekon_aktual }}</td>
               <td class="px-4 py-3">
                 <span class="text-xs px-2 py-1 rounded {{ $item->kategori_foto === 'representatif' ? 'bg-gray-100 text-gray-700' : 'bg-blue-100 text-blue-700' }}">

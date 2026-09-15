@@ -46,16 +46,16 @@
 
           <div x-show="mode === 'existing'" class="mb-4">
             <label class="block text-sm font-medium text-gray-700">Item Pekerjaan</label>
-            <select name="item_pekerjaan_id" class="block w-full mt-1 border-gray-300 rounded">
+            <select name="katalog_item_id" class="block w-full mt-1 border-gray-300 rounded">
               <option value="">-- Pilih Item --</option>
-              @foreach ($itemPekerjaans as $ip)
-              <option value="{{ $ip->id }}" {{ (string) old('item_pekerjaan_id') === (string) $ip->id ? 'selected' : '' }}>
-                {{ $ip->kode_designator }} — {{ $ip->uraian_pekerjaan }} ({{ $ip->satuan }})
+              @foreach ($katalogItems as $ki)
+              <option value="{{ $ki->id }}" {{ (string) old('katalog_item_id') === (string) $ki->id ? 'selected' : '' }}>
+                {{ $ki->kode_designator }} — {{ $ki->uraian_pekerjaan }} ({{ $ki->satuan }})
               </option>
               @endforeach
             </select>
-            @error('item_pekerjaan_id') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-            @if ($itemPekerjaans->isEmpty())
+            @error('katalog_item_id') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+            @if ($katalogItems->isEmpty())
             <p class="mt-1 text-xs text-gray-500">Belum ada master data item. Pakai opsi "Item Baru (Manual)" dulu.</p>
             @endif
           </div>

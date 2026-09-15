@@ -168,9 +168,9 @@
       @foreach ($group['items'] as $item)
       <tr>
         <td>{{ $no++ }}</td>
-        <td>{{ $item->itemPekerjaan->kode_designator }}</td>
-        <td>{{ $item->itemPekerjaan->uraian_pekerjaan }}</td>
-        <td>{{ $item->itemPekerjaan->satuan }}</td>
+        <td>{{ $item->katalogItem->kode_designator }}</td>
+        <td>{{ $item->katalogItem->uraian_pekerjaan }}</td>
+        <td>{{ $item->katalogItem->satuan }}</td>
         <td>{{ $item->qty_drm }}</td>
         <td>{{ $item->qty_rekon_aktual }}</td>
         <td>{{ $item->qty_tambah > 0 ? $item->qty_tambah : '-' }}</td>

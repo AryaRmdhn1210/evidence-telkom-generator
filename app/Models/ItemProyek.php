@@ -15,7 +15,7 @@ class ItemProyek extends Model
 
     protected $fillable = [
         'proyek_id',
-        'item_pekerjaan_id',
+        'katalog_item_id',
         'qty_drm',
         'qty_rekon_aktual',
         'qty_tambah',
@@ -29,9 +29,9 @@ class ItemProyek extends Model
         return $this->belongsTo(Proyek::class, 'proyek_id');
     }
 
-    public function itemPekerjaan(): BelongsTo
+    public function katalogItem(): BelongsTo
     {
-        return $this->belongsTo(ItemPekerjaan::class, 'item_pekerjaan_id');
+        return $this->belongsTo(KatalogItem::class, 'katalog_item_id');
     }
 
     public function fotoBukti(): HasMany

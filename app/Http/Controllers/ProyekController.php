@@ -22,7 +22,7 @@ class ProyekController extends Controller
 
   public function show(Proyek $proyek)
   {
-    $proyek->load(['itemProyek.itemPekerjaan', 'itemProyek.fotoBukti']);
+    $proyek->load(['itemProyek.katalogItem', 'itemProyek.fotoBukti']);
 
     return view('proyek.show', compact('proyek'));
   }
@@ -97,7 +97,7 @@ class ProyekController extends Controller
 
   public function review(Proyek $proyek)
   {
-    $proyek->load(['itemProyek.itemPekerjaan', 'itemProyek.fotoBukti']);
+    $proyek->load(['itemProyek.katalogItem', 'itemProyek.fotoBukti']);
 
     $totalItem = $proyek->itemProyek->count();
     $itemLengkap = $proyek->itemProyek->where('status_lengkap', true)->count();
@@ -110,7 +110,7 @@ class ProyekController extends Controller
   public function generate(Proyek $proyek)
   {
     $proyek->load([
-      'itemProyek.itemPekerjaan',
+      'itemProyek.katalogItem',
       'itemProyek.fotoBukti',
       'laporan' => fn($q) => $q->latest(),
       'laporan.pembuat',

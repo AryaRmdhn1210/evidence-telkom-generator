@@ -17,7 +17,7 @@ class LaporanGenerator
   public function generate(Proyek $proyek, string $tanggalUjiTerima, int $userId): Laporan
   {
     $proyek->load([
-      'itemProyek.itemPekerjaan',
+      'itemProyek.katalogItem',
       'itemProyek.fotoBukti' => fn($q) => $q->orderBy('nomor_urut'),
     ]);
 
@@ -49,7 +49,7 @@ class LaporanGenerator
     $index = 0;
 
     foreach ($itemProyekCollection->sortBy('urutan_item') as $item) {
-      $kategori = $item->itemPekerjaan->kategori_pekerjaan ?: 'LAIN-LAIN';
+      $kategori = $item->katalogItem->kategori_pekerjaan ?: 'LAIN-LAIN';
 
       if (!isset($groups[$kategori])) {
         $groups[$kategori] = [
@@ -68,7 +68,7 @@ class LaporanGenerator
 
   protected function fotoCaption($item, $foto): string
   {
-    $kode = $item->itemPekerjaan->kode_designator;
+    $kode = $item->katalogItem->kode_designator;
 
     if ($item->kategori_foto === 'representatif') {
       return $kode;
@@ -118,7 +118,6 @@ class LaporanGenerator
       ['PELAKSANA', $proyek->pelaksana ?: '-'],
     ];
 
-    // Ruang kosong di atas untuk logo (dipersempit supaya semua konten muat 1 halaman)
     $section->addTextBreak(2);
 
     $section->addText('BILL OF QUANTITY (BOQ) HASIL UJI TERIMA', ['bold' => true, 'size' => 14], ['alignment' => Jc::CENTER]);
@@ -160,9 +159,9 @@ class LaporanGenerator
         $boqTable->addRow();
         $values = [
           (string) $no,
-          $item->itemPekerjaan->kode_designator,
-          $item->itemPekerjaan->uraian_pekerjaan,
-          $item->itemPekerjaan->satuan,
+          $item->katalogItem->kode_designator,
+          $item->katalogItem->uraian_pekerjaan,
+          $item->katalogItem->satuan,
           (string) $item->qty_drm,
           (string) $item->qty_rekon_aktual,
           $item->qty_tambah > 0 ? (string) $item->qty_tambah : '-',
@@ -214,7 +213,6 @@ class LaporanGenerator
     $right->addText($proyek->nama_pelaksana_ttd ?: '-', [], ['alignment' => Jc::CENTER]);
     $right->addText('NIK: ' . ($proyek->nik_pelaksana_ttd ?: '-'), [], ['alignment' => Jc::CENTER]);
 
-    // Halaman Evidence
     $section->addPageBreak();
     $section->addTextBreak(2);
     $section->addText('EVIDENCE PEKERJAAN', ['bold' => true, 'size' => 14], ['alignment' => Jc::CENTER]);
