@@ -54,14 +54,19 @@
           Semua foto sudah lengkap.
         </div>
         @else
-        <form action="{{ route('proyek.item.upload.store', [$proyek, $itemProyek]) }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('proyek.item.upload.store', [$proyek, $itemProyek]) }}" method="POST" enctype="multipart/form-data" x-data="{ loading: false }" @submit="loading = true">
           @csrf
           <label class="block mb-2 text-sm font-medium text-gray-700">
             Upload foto (bisa pilih banyak sekaligus)
           </label>
           <input type="file" name="foto[]" multiple accept="image/*" class="block w-full mb-4">
-          <button type="submit" class="px-4 py-2 text-white bg-red-600 rounded hover:bg-red-700">
-            Upload
+          <button type="submit" :disabled="loading"
+            class="inline-flex items-center gap-2 px-4 py-2 text-white bg-red-600 rounded hover:bg-red-700 disabled:opacity-60 disabled:cursor-not-allowed">
+            <svg x-show="loading" x-cloak class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>
+            <span x-text="loading ? 'Mengupload...' : 'Upload'"></span>
           </button>
         </form>
         @endif
