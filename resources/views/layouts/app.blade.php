@@ -7,30 +7,41 @@
 
         <title>{{ config('app.name', 'Laravel') }}</title>
 
-        <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
-        <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100">
-            @include('layouts.navigation')
+        <div class="flex min-h-screen bg-gradient-to-br from-slate-100 via-white to-slate-200" x-data="{ sidebarOpen: false }">
 
-            <!-- Page Heading -->
-            @isset($header)
-                <header class="bg-white shadow">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        {{ $header }}
-                    </div>
-                </header>
-            @endisset
+            @include('layouts.sidebar')
 
-            <!-- Page Content -->
-            <main>
-                {{ $slot }}
-            </main>
+            <div class="flex flex-col flex-1 min-w-0">
+                <div class="flex items-center justify-between px-4 py-3 shadow sm:hidden bg-white/70 backdrop-blur-xl">
+                    <button @click="sidebarOpen = true" class="text-slate-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                    <x-application-logo class="w-8 h-8 text-gray-800 fill-current" />
+                    <div></div>
+                </div>
+
+                @isset($header)
+                    <header class="shadow-sm bg-white/60 backdrop-blur-xl">
+                        <div class="px-4 py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
+                            {{ $header }}
+                        </div>
+                    </header>
+                @endisset
+
+                <main class="flex-1">
+                    {{ $slot }}
+                </main>
+            </div>
         </div>
+
+        @stack('scripts')
     </body>
 </html>
