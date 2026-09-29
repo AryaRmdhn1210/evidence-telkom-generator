@@ -8,6 +8,8 @@
   <div class="py-8">
     <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
 
+      <x-step-indicator current="3" />
+
       @if (session('status'))
       <div class="p-3 mb-4 text-green-700 bg-green-100 rounded">{{ session('status') }}</div>
       @endif

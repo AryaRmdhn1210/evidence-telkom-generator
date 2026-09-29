@@ -46,6 +46,7 @@
       </div>
 
       <div class="overflow-hidden bg-white rounded shadow">
+        <div class="overflow-x-auto">
         <table class="w-full text-sm text-left">
           <thead class="text-gray-600 bg-gray-50">
             <tr>
@@ -100,6 +101,7 @@
             @endforelse
           </tbody>
         </table>
+        </div>
       </div>
 
       <div class="flex justify-end">

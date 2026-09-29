@@ -8,6 +8,8 @@
   <div class="py-8">
     <div class="max-w-5xl mx-auto space-y-6 sm:px-6 lg:px-8">
 
+      <x-step-indicator current="4" />
+
       @if (session('status'))
       <div class="p-3 text-green-700 bg-green-100 rounded">{{ session('status') }}</div>
       @endif
@@ -28,7 +30,8 @@
       </div>
 
       <div class="overflow-hidden bg-white rounded shadow">
-      <table class="w-full text-sm text-left">
+        <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left">
           <thead class="text-gray-600 bg-gray-50">
             <tr>
               <th class="px-4 py-3">Kode Designator</th>
@@ -70,6 +73,7 @@
             @endforelse
           </tbody>
         </table>
+        </div>
       </div>
 
       <div class="p-6 bg-white rounded shadow">

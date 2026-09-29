@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="text-xl font-semibold leading-tight text-gray-800">
             Kelola User
         </h2>
     </x-slot>
@@ -9,27 +9,28 @@
         <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
 
             @if (session('status'))
-                <div class="mb-4 p-3 bg-green-100 text-green-700 rounded">
+                <div class="p-3 mb-4 text-green-700 bg-green-100 rounded">
                     {{ session('status') }}
                 </div>
             @endif
 
             @if (session('error'))
-                <div class="mb-4 p-3 bg-red-100 text-red-700 rounded">
+                <div class="p-3 mb-4 text-red-700 bg-red-100 rounded">
                     {{ session('error') }}
                 </div>
             @endif
 
             <div class="flex justify-end mb-4">
                 <a href="{{ route('admin.users.create') }}"
-                   class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">
+                class="px-4 py-2 text-white bg-indigo-600 rounded hover:bg-indigo-700">
                     + Tambah User
                 </a>
             </div>
 
-            <div class="bg-white shadow rounded overflow-hidden">
+            <div class="overflow-hidden bg-white rounded shadow">
+                <div class="overflow-x-auto">
                 <table class="w-full text-sm text-left">
-                    <thead class="bg-gray-50 text-gray-600">
+                    <thead class="text-gray-600 bg-gray-50">
                         <tr>
                             <th class="px-4 py-3">Nama</th>
                             <th class="px-4 py-3">Email</th>
@@ -50,7 +51,7 @@
                                 <td class="px-4 py-3 space-x-2">
                                     <a href="{{ route('admin.users.edit', $user) }}" class="text-indigo-600 hover:underline">Edit</a>
                                     <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="inline"
-                                          onsubmit="return confirm('Yakin hapus user ini?')">
+                                        onsubmit="return confirm('Yakin hapus user ini?')">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="text-red-600 hover:underline">Hapus</button>
@@ -60,6 +61,7 @@
                         @endforeach
                     </tbody>
                 </table>
+                </div>
             </div>
 
             <div class="mt-4">

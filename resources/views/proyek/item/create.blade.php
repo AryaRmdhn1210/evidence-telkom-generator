@@ -8,12 +8,14 @@
   <div class="py-8">
     <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
 
+      <x-step-indicator current="2" />
+
       @if ($errors->any())
       <div class="p-3 mb-4 text-sm text-red-700 bg-red-100 rounded">
         <p class="mb-1 font-medium">Periksa kembali isian berikut:</p>
         <ul class="list-disc list-inside">
           @foreach ($errors->all() as $error)
-          <li>{{ $error }}</li>
+            <li>{{ $error }}</li>
           @endforeach
         </ul>
       </div>
@@ -30,7 +32,7 @@
                     get hasilHitung() { return Number(this.drm) + Number(this.tambah) - Number(this.kurang); },
                     get sesuai() { return this.hasilHitung === Number(this.rekon); },
                     get jumlahFotoWajib() { return this.kategori === 'representatif' ? 1 : Number(this.rekon || 0); }
-                 }">
+                }">
         <form method="POST" action="{{ route('proyek.item.store', $proyek) }}">
           @csrf
 
@@ -46,15 +48,15 @@
 
           <div x-show="mode === 'existing'" class="mb-4">
             <label class="block text-sm font-medium text-gray-700">Item Pekerjaan</label>
-            <select name="katalog_item_id" class="block w-full mt-1 border-gray-300 rounded">
+            <select name="item_pekerjaan_id" class="block w-full mt-1 border-gray-300 rounded">
               <option value="">-- Pilih Item --</option>
-              @foreach ($katalogItems as $ki)
-              <option value="{{ $ki->id }}" {{ (string) old('katalog_item_id') === (string) $ki->id ? 'selected' : '' }}>
-                {{ $ki->kode_designator }} — {{ $ki->uraian_pekerjaan }} ({{ $ki->satuan }})
+              @foreach ($katalogItems as $ip)
+              <option value="{{ $ip->id }}" {{ (string) old('item_pekerjaan_id') === (string) $ip->id ? 'selected' : '' }}>
+                {{ $ip->kode_designator }} — {{ $ip->uraian_pekerjaan }} ({{ $ip->satuan }})
               </option>
               @endforeach
             </select>
-            @error('katalog_item_id') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+            @error('item_pekerjaan_id') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
             @if ($katalogItems->isEmpty())
             <p class="mt-1 text-xs text-gray-500">Belum ada master data item. Pakai opsi "Item Baru (Manual)" dulu.</p>
             @endif

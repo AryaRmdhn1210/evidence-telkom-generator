@@ -8,21 +8,23 @@
   <div class="py-8">
     <div class="max-w-3xl mx-auto space-y-6 sm:px-6 lg:px-8">
 
+      <x-step-indicator current="5" />
+
       @if (session('status'))
       <div class="p-3 text-green-700 bg-green-100 rounded">{{ session('status') }}</div>
       @endif
 
       <div class="p-6 bg-white rounded shadow">
         @if (!$semuaLengkap)
-        @if (Auth::user()->role === 'admin')
-        <div class="p-3 mb-4 text-sm text-yellow-700 bg-yellow-100 rounded">
-          Masih ada {{ $itemKurang }} item yang fotonya belum lengkap. Sebagai admin, laporan tetap bisa digenerate.
-        </div>
-        @else
-        <div class="p-3 mb-4 text-sm text-red-700 bg-red-100 rounded">
-          Masih ada {{ $itemKurang }} item yang fotonya belum lengkap. Lengkapi dulu sebelum generate laporan.
-        </div>
-        @endif
+          @if (Auth::user()->role === 'admin')
+          <div class="p-3 mb-4 text-sm text-yellow-700 bg-yellow-100 rounded">
+            Masih ada {{ $itemKurang }} item yang fotonya belum lengkap. Sebagai admin, laporan tetap bisa digenerate.
+          </div>
+          @else
+          <div class="p-3 mb-4 text-sm text-red-700 bg-red-100 rounded">
+            Masih ada {{ $itemKurang }} item yang fotonya belum lengkap. Lengkapi dulu sebelum generate laporan.
+          </div>
+          @endif
         @endif
 
         @if ($semuaLengkap || Auth::user()->role === 'admin')
@@ -46,6 +48,7 @@
 
       <div class="overflow-hidden bg-white rounded shadow">
         <div class="p-4 font-semibold text-gray-700 border-b">Riwayat Laporan</div>
+        <div class="overflow-x-auto">
         <table class="w-full text-sm text-left">
           <thead class="text-gray-600 bg-gray-50">
             <tr>
@@ -86,6 +89,7 @@
             @endforelse
           </tbody>
         </table>
+        </div>
       </div>
 
       <div>

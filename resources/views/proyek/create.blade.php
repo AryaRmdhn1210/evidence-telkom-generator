@@ -7,6 +7,9 @@
 
   <div class="py-8">
     <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
+
+      <x-step-indicator current="1" />
+
       <div class="p-6 bg-white rounded shadow">
         <form method="POST" action="{{ route('proyek.store') }}" enctype="multipart/form-data">
           @csrf
