@@ -5,6 +5,7 @@ use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\ProyekController;
 use App\Http\Controllers\ItemProyekController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\KatalogItemController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -37,6 +38,7 @@ Route::middleware('auth')->group(function () {
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::resource('users', UserManagementController::class)->except(['show']);
+    Route::resource('katalog', KatalogItemController::class)->except(['show']);
 });
 
 require __DIR__ . '/auth.php';
