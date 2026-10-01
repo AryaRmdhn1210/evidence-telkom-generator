@@ -14,9 +14,13 @@
       </div>
       @endif
 
-      <div class="flex justify-end mb-4">
+      <div class="flex flex-col gap-3 mb-4 sm:flex-row sm:items-center sm:justify-between">
+        <form method="GET" class="flex-1 max-w-sm">
+          <input type="text" name="search" value="{{ $search }}" placeholder="Cari nama proyek, witel, lokasi, atau STO..."
+            class="w-full text-sm border-gray-300 rounded" onchange="this.form.submit()">
+        </form>
         <a href="{{ route('proyek.create') }}"
-          class="px-4 py-2 text-white bg-red-600 rounded hover:bg-red-700">
+          class="px-4 py-2 text-sm text-center text-white bg-red-600 rounded hover:bg-red-700">
           + Buat Proyek Baru
         </a>
       </div>
@@ -66,8 +70,16 @@
               </tr>
               @empty
               <tr>
-                <td colspan="5" class="px-4 py-6 text-center text-gray-500">
-                  Belum ada proyek. Klik "Buat Proyek Baru" untuk mulai.
+                <td colspan="5" class="px-6 py-12 text-center">
+                  <svg class="w-12 h-12 mx-auto text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
+                  </svg>
+                  <p class="mt-3 text-sm font-medium text-gray-600">
+                    {{ $search ? 'Tidak ada proyek yang cocok dengan pencarian' : 'Belum ada proyek' }}
+                  </p>
+                  @unless ($search)
+                  <p class="mt-1 text-sm text-gray-400">Klik "Buat Proyek Baru" untuk mulai mencatat proyek pertamamu.</p>
+                  @endunless
                 </td>
               </tr>
               @endforelse

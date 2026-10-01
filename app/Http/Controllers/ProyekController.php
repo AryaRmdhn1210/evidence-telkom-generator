@@ -11,13 +11,22 @@ use App\Models\Laporan;
 
 class ProyekController extends Controller
 {
-  public function index()
+  public function index(Request $request)
   {
-    $proyeks = Proyek::with('pembuat')
-      ->latest()
-      ->paginate(10);
+    $search = $request->get('search');
 
-    return view('proyek.index', compact('proyeks'));
+    $proyeks = Proyek::with('pembuat')
+      ->when($search, function ($q) use ($search) {
+        $q->where('nama_proyek', 'like', "%{$search}%")
+          ->orWhere('witel', 'like', "%{$search}%")
+          ->orWhere('lokasi', 'like', "%{$search}%")
+          ->orWhere('sto', 'like', "%{$search}%");
+      })
+      ->latest()
+      ->paginate(10)
+      ->withQueryString();
+
+    return view('proyek.index', compact('proyeks', 'search'));
   }
 
   public function show(Proyek $proyek)
@@ -144,7 +153,7 @@ class ProyekController extends Controller
       ->with('status', 'Laporan berhasil digenerate.');
   }
 
-    public function destroyLaporan(Proyek $proyek, Laporan $laporan)
+  public function destroyLaporan(Proyek $proyek, Laporan $laporan)
   {
     if ($laporan->proyek_id !== $proyek->id) {
       abort(404);

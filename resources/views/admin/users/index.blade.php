@@ -20,9 +20,13 @@
             </div>
             @endif
 
-            <div class="flex justify-end mb-4">
+            <div class="flex flex-col gap-3 mb-4 sm:flex-row sm:items-center sm:justify-between">
+                <form method="GET" class="flex-1 max-w-sm">
+                    <input type="text" name="search" value="{{ $search }}" placeholder="Cari nama, username, atau email..."
+                        class="w-full text-sm border-gray-300 rounded" onchange="this.form.submit()">
+                </form>
                 <a href="{{ route('admin.users.create') }}"
-                    class="px-4 py-2 text-white bg-indigo-600 rounded hover:bg-indigo-700">
+                    class="px-4 py-2 text-sm text-center text-white bg-red-600 rounded hover:bg-red-700">
                     + Tambah User
                 </a>
             </div>
@@ -39,7 +43,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($users as $user)
+                            @forelse ($users as $user)
                             <tr class="border-t">
                                 <td class="px-4 py-3">{{ $user->name }}</td>
                                 <td class="px-4 py-3">{{ $user->email }}</td>
@@ -68,7 +72,18 @@
                                     </form>
                                 </td>
                             </tr>
-                            @endforeach
+                            @empty
+                            <tr>
+                                <td colspan="4" class="px-6 py-12 text-center">
+                                    <svg class="w-12 h-12 mx-auto text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-1a4 4 0 100-8 4 4 0 000 8zm6 3a4 4 0 00-4-4H7a4 4 0 00-4 4v2h14v-2z" />
+                                    </svg>
+                                    <p class="mt-3 text-sm font-medium text-gray-600">
+                                        {{ $search ? 'Tidak ada user yang cocok dengan pencarian' : 'Belum ada user' }}
+                                    </p>
+                                </td>
+                            </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
