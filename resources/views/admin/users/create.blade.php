@@ -56,7 +56,7 @@
 
                     <div class="flex justify-end gap-2">
                         <a href="{{ route('admin.users.index') }}" class="px-4 py-2 border rounded">Batal</a>
-                        <button type="submit" class="px-4 py-2 text-white bg-indigo-600 rounded hover:bg-indigo-700">
+                        <button type="submit" class="px-4 py-2 text-white bg-red-600 rounded hover:bg-red-700">
                             Simpan
                         </button>
                     </div>

@@ -47,7 +47,7 @@
                     <div class="flex justify-end gap-2">
                         <a href="{{ route('admin.katalog.index') }}" class="px-4 py-2 border rounded">Batal</a>
                         <button type="submit" :disabled="loading"
-                            class="inline-flex items-center gap-2 px-4 py-2 text-white bg-indigo-600 rounded hover:bg-indigo-700 disabled:opacity-60 disabled:cursor-not-allowed">
+                            class="inline-flex items-center gap-2 px-4 py-2 text-white bg-red-600 rounded hover:bg-red-700 disabled:opacity-60 disabled:cursor-not-allowed">
                             <svg x-show="loading" x-cloak class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
