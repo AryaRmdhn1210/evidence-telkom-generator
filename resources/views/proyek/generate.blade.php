@@ -10,9 +10,7 @@
 
       <x-step-indicator current="5" />
 
-      @if (session('status'))
-      <div class="p-3 text-green-700 bg-green-100 rounded">{{ session('status') }}</div>
-      @endif
+      <x-flash-message />
 
       <div class="p-6 bg-white rounded shadow">
         @if (!$semuaLengkap)

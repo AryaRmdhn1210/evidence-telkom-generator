@@ -10,9 +10,7 @@
 
       <x-step-indicator current="4" />
 
-      @if (session('status'))
-      <div class="p-3 text-green-700 bg-green-100 rounded">{{ session('status') }}</div>
-      @endif
+      <x-flash-message />
 
       <div class="grid grid-cols-3 gap-4">
         <div class="p-4 text-center bg-white rounded shadow">
@@ -31,48 +29,48 @@
 
       <div class="overflow-hidden bg-white rounded shadow">
         <div class="overflow-x-auto">
-        <table class="w-full text-sm text-left">
-          <thead class="text-gray-600 bg-gray-50">
-            <tr>
-              <th class="px-4 py-3">Kode Designator</th>
-              <th class="px-4 py-3">Item</th>
-              <th class="px-4 py-3">Satuan</th>
-              <th class="px-4 py-3">Rekon/Aktual</th>
-              <th class="px-4 py-3">Kategori</th>
-              <th class="px-4 py-3">Status Foto</th>
-            </tr>
-          </thead>
-          <tbody>
-            @forelse ($proyek->itemProyek as $item)
-            <tr class="border-t {{ $item->status_lengkap ? '' : 'bg-yellow-50' }}">
-              <td class="px-4 py-3 font-mono text-xs">{{ $item->katalogItem->kode_designator }}</td>
-              <td class="px-4 py-3">{{ $item->katalogItem->uraian_pekerjaan }}</td>
-              <td class="px-4 py-3">{{ $item->katalogItem->satuan }}</td>
-              <td class="px-4 py-3">{{ $item->qty_rekon_aktual }}</td>
-              <td class="px-4 py-3">
-                {{ $item->kategori_foto === 'representatif' ? 'Representatif' : 'Wajib per unit' }}
-              </td>
-              <td class="px-4 py-3">
-                @if ($item->status_lengkap)
-                <span class="px-2 py-1 text-xs text-green-700 bg-green-100 rounded">
-                  Lengkap ({{ $item->fotoBukti->count() }}/{{ $item->jumlah_foto_wajib }})
-                </span>
-                @else
-                <span class="px-2 py-1 text-xs text-yellow-700 bg-yellow-100 rounded">
-                  Kurang {{ $item->jumlah_foto_wajib - $item->fotoBukti->count() }} ({{ $item->fotoBukti->count() }}/{{ $item->jumlah_foto_wajib }})
-                </span>
-                @endif
-              </td>
-            </tr>
-            @empty
-            <tr>
-              <td colspan="6" class="px-4 py-6 text-center text-gray-500">
-                Belum ada item untuk direview.
-              </td>
-            </tr>
-            @endforelse
-          </tbody>
-        </table>
+          <table class="w-full text-sm text-left">
+            <thead class="text-gray-600 bg-gray-50">
+              <tr>
+                <th class="px-4 py-3">Kode Designator</th>
+                <th class="px-4 py-3">Item</th>
+                <th class="px-4 py-3">Satuan</th>
+                <th class="px-4 py-3">Rekon/Aktual</th>
+                <th class="px-4 py-3">Kategori</th>
+                <th class="px-4 py-3">Status Foto</th>
+              </tr>
+            </thead>
+            <tbody>
+              @forelse ($proyek->itemProyek as $item)
+              <tr class="border-t {{ $item->status_lengkap ? '' : 'bg-yellow-50' }}">
+                <td class="px-4 py-3 font-mono text-xs">{{ $item->katalogItem->kode_designator }}</td>
+                <td class="px-4 py-3">{{ $item->katalogItem->uraian_pekerjaan }}</td>
+                <td class="px-4 py-3">{{ $item->katalogItem->satuan }}</td>
+                <td class="px-4 py-3">{{ $item->qty_rekon_aktual }}</td>
+                <td class="px-4 py-3">
+                  {{ $item->kategori_foto === 'representatif' ? 'Representatif' : 'Wajib per unit' }}
+                </td>
+                <td class="px-4 py-3">
+                  @if ($item->status_lengkap)
+                  <span class="px-2 py-1 text-xs text-green-700 bg-green-100 rounded">
+                    Lengkap ({{ $item->fotoBukti->count() }}/{{ $item->jumlah_foto_wajib }})
+                  </span>
+                  @else
+                  <span class="px-2 py-1 text-xs text-yellow-700 bg-yellow-100 rounded">
+                    Kurang {{ $item->jumlah_foto_wajib - $item->fotoBukti->count() }} ({{ $item->fotoBukti->count() }}/{{ $item->jumlah_foto_wajib }})
+                  </span>
+                  @endif
+                </td>
+              </tr>
+              @empty
+              <tr>
+                <td colspan="6" class="px-4 py-6 text-center text-gray-500">
+                  Belum ada item untuk direview.
+                </td>
+              </tr>
+              @endforelse
+            </tbody>
+          </table>
         </div>
       </div>
 

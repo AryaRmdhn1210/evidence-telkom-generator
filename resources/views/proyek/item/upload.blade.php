@@ -10,9 +10,7 @@
 
       <x-step-indicator current="3" />
 
-      @if (session('status'))
-      <div class="p-3 mb-4 text-green-700 bg-green-100 rounded">{{ session('status') }}</div>
-      @endif
+      <x-flash-message />
 
       @if ($errors->any())
       <div class="p-3 mb-4 text-sm text-red-700 bg-red-100 rounded">

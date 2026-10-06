@@ -8,9 +8,7 @@
   <div class="py-8">
     <div class="max-w-5xl mx-auto space-y-6 sm:px-6 lg:px-8">
 
-      @if (session('status'))
-      <div class="p-3 text-green-700 bg-green-100 rounded">{{ session('status') }}</div>
-      @endif
+      <x-flash-message />
 
       <div class="p-6 bg-white rounded shadow">
         <dl class="grid grid-cols-2 gap-4 text-sm">
