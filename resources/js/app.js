@@ -31,3 +31,43 @@ document.addEventListener('click', (e) => {
 window.addEventListener('pageshow', () => {
     document.querySelector('main')?.classList.remove('page-fade-out');
 });
+
+// Grafik dashboard: data dibaca dari atribut data-* pada elemen <canvas>
+document.addEventListener('DOMContentLoaded', () => {
+    const barCanvas = document.getElementById('chartLaporanBulanan');
+    if (barCanvas) {
+        new Chart(barCanvas, {
+            type: 'bar',
+            data: {
+                labels: JSON.parse(barCanvas.dataset.labels),
+                datasets: [{
+                    label: 'Laporan',
+                    data: JSON.parse(barCanvas.dataset.values),
+                    backgroundColor: '#dc2626',
+                    borderRadius: 6,
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+            }
+        });
+    }
+
+    const donutCanvas = document.getElementById('chartStatusItem');
+    if (donutCanvas) {
+        new Chart(donutCanvas, {
+            type: 'doughnut',
+            data: {
+                labels: ['Lengkap', 'Belum Lengkap'],
+                datasets: [{
+                    data: JSON.parse(donutCanvas.dataset.values),
+                    backgroundColor: ['#16a34a', '#eab308'],
+                }]
+            },
+            options: {
+                plugins: { legend: { position: 'bottom' } }
+            }
+        });
+    }
+});

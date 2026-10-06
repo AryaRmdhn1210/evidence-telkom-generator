@@ -47,24 +47,6 @@ class DashboardController extends Controller
         ->count();
     }
 
-    // Aktivitas terbaru: gabungan Proyek dibuat + Laporan digenerate
-    $aktivitasProyek = (clone $proyekQuery)->latest()->take(5)->get()->map(fn($p) => [
-      'jenis' => 'proyek',
-      'teks' => 'Proyek "' . $p->nama_proyek . '" dibuat',
-      'waktu' => $p->created_at,
-    ]);
-
-    $aktivitasLaporan = (clone $laporanQuery)->with('proyek')->latest()->take(5)->get()->map(fn($l) => [
-      'jenis' => 'laporan',
-      'teks' => 'Laporan untuk "' . ($l->proyek->nama_proyek ?? '-') . '" digenerate',
-      'waktu' => $l->created_at,
-    ]);
-
-    $aktivitasTerbaru = $aktivitasProyek->concat($aktivitasLaporan)
-      ->sortByDesc('waktu')
-      ->take(5)
-      ->values();
-
     // Ranking user teraktif, khusus admin
     $rankingUser = [];
     if ($isAdmin) {
@@ -84,7 +66,6 @@ class DashboardController extends Controller
       'itemBelumLengkap',
       'bulanLabels',
       'bulanData',
-      'aktivitasTerbaru',
       'rankingUser'
     ));
   }
