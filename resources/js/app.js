@@ -1,6 +1,8 @@
 import Alpine from 'alpinejs';
+import Chart from 'chart.js/auto';
 
 window.Alpine = Alpine;
+window.Chart = Chart;
 
 Alpine.start();
 
@@ -22,4 +24,10 @@ document.addEventListener('click', (e) => {
     setTimeout(() => {
         window.location.href = link.href;
     }, 250);
+});
+
+// Saat user menekan tombol Back/Forward, browser memulihkan halaman dari cache
+// dengan class fade-out masih menempel. Hapus class itu supaya konten tampil lagi.
+window.addEventListener('pageshow', () => {
+    document.querySelector('main')?.classList.remove('page-fade-out');
 });

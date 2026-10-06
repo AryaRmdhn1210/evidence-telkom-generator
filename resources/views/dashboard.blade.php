@@ -82,37 +82,38 @@
     </div>
 
     @push('scripts')
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
     <script>
-        new Chart(document.getElementById('chartLaporanBulanan'), {
-            type: 'bar',
-            data: {
-                labels: @json($bulanLabels),
-                datasets: [{
-                    label: 'Laporan',
-                    data: @json($bulanData),
-                    backgroundColor: '#dc2626',
-                    borderRadius: 6,
-                }]
-            },
-            options: {
-                plugins: { legend: { display: false } },
-                scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
-            }
-        });
+        document.addEventListener('DOMContentLoaded', () => {
+            new Chart(document.getElementById('chartLaporanBulanan'), {
+                type: 'bar',
+                data: {
+                    labels: @json($bulanLabels),
+                    datasets: [{
+                        label: 'Laporan',
+                        data: @json($bulanData),
+                        backgroundColor: '#dc2626',
+                        borderRadius: 6,
+                    }]
+                },
+                options: {
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+                }
+            });
 
-        new Chart(document.getElementById('chartStatusItem'), {
-            type: 'doughnut',
-            data: {
-                labels: ['Lengkap', 'Belum Lengkap'],
-                datasets: [{
-                    data: [{{ $itemLengkap }}, {{ $itemBelumLengkap }}],
-                    backgroundColor: ['#16a34a', '#eab308'],
-                }]
-            },
-            options: {
-                plugins: { legend: { position: 'bottom' } }
-            }
+            new Chart(document.getElementById('chartStatusItem'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Lengkap', 'Belum Lengkap'],
+                    datasets: [{
+                        data: [{{ $itemLengkap }}, {{ $itemBelumLengkap }}],
+                        backgroundColor: ['#16a34a', '#eab308'],
+                    }]
+                },
+                options: {
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
         });
     </script>
     @endpush
