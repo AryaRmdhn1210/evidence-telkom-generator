@@ -112,7 +112,8 @@
         </div>
       </div>
 
-      <div class="flex justify-end">
+      <div class="flex items-center justify-between">
+        <a href="{{ route('proyek.index') }}" class="text-sm text-gray-600 hover:underline">← Kembali ke Daftar Proyek</a>
         <a href="{{ route('proyek.review', $proyek) }}"
           class="px-4 py-2 text-sm text-white bg-red-600 rounded hover:bg-red-700">
           Review Laporan →
