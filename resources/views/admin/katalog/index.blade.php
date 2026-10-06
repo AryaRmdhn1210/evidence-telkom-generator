@@ -8,12 +8,7 @@
     <div class="py-8">
         <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
 
-            @if (session('status'))
-            <div class="p-3 mb-4 text-green-700 bg-green-100 rounded">{{ session('status') }}</div>
-            @endif
-            @if (session('error'))
-            <div class="p-3 mb-4 text-red-700 bg-red-100 rounded">{{ session('error') }}</div>
-            @endif
+            <x-flash-message />
 
             <div class="flex flex-col gap-3 mb-4 sm:flex-row sm:items-center sm:justify-between">
                 <form method="GET" class="flex-1 max-w-sm">
