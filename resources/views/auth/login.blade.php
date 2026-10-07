@@ -29,7 +29,7 @@ $bgUrl = asset('images/login-bg.jpg');
     <div class="relative z-10 w-full max-w-md p-10 text-white border bg-white/10 backdrop-blur-md border-white/20 rounded-3xl">
         <div class="text-center mb-7">
             <img src="{{ asset('images/Logo-telkom-akses.jpg') }}" alt="PT Telkom Akses"
-                class="w-auto mx-auto mb-5 h-9 drop-shadow">
+                class="w-auto h-20 mx-auto mb-5 drop-shadow-lg">
             <h1 class="text-2xl font-bold tracking-tight">PORTAL LOGIN</h1>
             <p class="mt-1 text-sm text-white/70">Evidence Telkom Generator</p>
         </div>
@@ -63,7 +63,8 @@ $bgUrl = asset('images/login-bg.jpg');
                 </div>
             </div>
 
-            <div x-data="{ show: false }">
+            <!-- Password: selalu tersembunyi, tampil hanya setelah ikon mata ditekan -->
+            <div x-data="{ show: false }" @pageshow.window="show = false">
                 <label class="block mb-2 text-sm font-semibold text-white">Password</label>
                 <div class="relative">
                     <span class="absolute inset-y-0 flex items-center text-gray-400 left-4">
@@ -71,10 +72,13 @@ $bgUrl = asset('images/login-bg.jpg');
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm6-2V7a6 6 0 10-12 0v2m-1 0h14a1 1 0 011 1v9a2 2 0 01-2 2H6a2 2 0 01-2-2v-9a1 1 0 011-1z" />
                         </svg>
                     </span>
-                    <input :type="show ? 'text' : 'password'" name="password" required
+                    <input type="password" :type="show ? 'text' : 'password'" name="password" required
+                        autocomplete="current-password"
                         placeholder="Masukkan password"
                         class="w-full py-3 text-gray-900 placeholder-gray-400 bg-white rounded-full pr-11 pl-11 focus:outline-none focus:ring-2 focus:ring-red-500">
                     <button type="button" @click="show = !show"
+                        :aria-label="show ? 'Sembunyikan password' : 'Tampilkan password'"
+                        :title="show ? 'Sembunyikan password' : 'Tampilkan password'"
                         class="absolute inset-y-0 flex items-center text-gray-400 right-4 hover:text-gray-600">
                         <svg x-show="!show" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
