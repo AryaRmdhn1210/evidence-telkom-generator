@@ -19,7 +19,6 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['au
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::resource('proyek', ProyekController::class)->middleware('auth');
     Route::get('/proyek/{proyek}/review', [ProyekController::class, 'review'])->name('proyek.review');
     Route::get('/proyek/{proyek}/generate', [ProyekController::class, 'generate'])->name('proyek.generate');
@@ -38,6 +37,7 @@ Route::middleware('auth')->group(function () {
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::resource('users', UserManagementController::class)->except(['show']);
+    Route::patch('users/{user}/aktif', [UserManagementController::class, 'toggleAktif'])->name('users.aktif');
     Route::resource('katalog', KatalogItemController::class)->except(['show']);
 });
 
