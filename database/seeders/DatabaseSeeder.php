@@ -12,14 +12,30 @@ class DatabaseSeeder extends Seeder
 
     /**
      * Seed the application's database.
+     *
+     * Password di bawah hanya untuk pengembangan dan demo.
+     * Ganti lewat menu Kelola User setelah login pertama.
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        User::firstOrCreate(
+            ['username' => 'admin'],
+            [
+                'name' => 'Admin',
+                'email' => 'admin@evidencetelkom.test',
+                'password' => 'password',
+                'role' => 'admin',
+            ]
+        );
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        User::firstOrCreate(
+            ['username' => 'karyawan'],
+            [
+                'name' => 'Karyawan Contoh',
+                'email' => 'karyawan@evidencetelkom.test',
+                'password' => 'password',
+                'role' => 'karyawan',
+            ]
+        );
     }
 }
