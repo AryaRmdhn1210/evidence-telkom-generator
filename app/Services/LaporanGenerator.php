@@ -22,6 +22,7 @@ class LaporanGenerator
     ]);
 
     $groupedItems = $this->groupItemsByKategori($proyek->itemProyek);
+    $evidenceEntries = $this->buildEvidenceEntries($groupedItems);
 
     $folder = 'laporan/' . $proyek->id;
     Storage::disk('public')->makeDirectory($folder);
@@ -30,8 +31,8 @@ class LaporanGenerator
     $pdfPath = $folder . '/' . $filenameBase . '.pdf';
     $wordPath = $folder . '/' . $filenameBase . '.docx';
 
-    $this->renderPdf($proyek, $groupedItems, $tanggalUjiTerima, $pdfPath);
-    $this->renderWord($proyek, $groupedItems, $tanggalUjiTerima, $wordPath);
+    $this->renderPdf($proyek, $groupedItems, $evidenceEntries, $tanggalUjiTerima, $pdfPath);
+    $this->renderWord($proyek, $groupedItems, $evidenceEntries, $tanggalUjiTerima, $wordPath);
 
     return Laporan::create([
       'proyek_id' => $proyek->id,
@@ -66,7 +67,36 @@ class LaporanGenerator
     return array_values($groups);
   }
 
-  protected function fotoCaption($item, $foto): string
+  /**
+   * Susun daftar entri halaman evidence: foto yang ada, lalu slot kosong
+   * untuk foto yang masih kurang (foto = null) supaya ditandai di laporan.
+   *
+   * @return array<int, array{item: mixed, foto: mixed, nomor: int}>
+   */
+  protected function buildEvidenceEntries(array $groupedItems): array
+  {
+    $entries = [];
+
+    foreach ($groupedItems as $group) {
+      foreach ($group['items'] as $item) {
+        foreach ($item->fotoBukti as $foto) {
+          $entries[] = ['item' => $item, 'foto' => $foto, 'nomor' => (int) $foto->nomor_urut];
+        }
+
+        $kurang = $item->jumlah_foto_wajib - $item->fotoBukti->count();
+        $nomor = (int) ($item->fotoBukti->max('nomor_urut') ?? 0);
+
+        for ($i = 0; $i < $kurang; $i++) {
+          $nomor++;
+          $entries[] = ['item' => $item, 'foto' => null, 'nomor' => $nomor];
+        }
+      }
+    }
+
+    return $entries;
+  }
+
+  protected function fotoCaption($item, int $nomor): string
   {
     $kode = $item->katalogItem->kode_designator;
 
@@ -74,16 +104,17 @@ class LaporanGenerator
       return $kode;
     }
 
-    return $kode . ' (' . $foto->nomor_urut . ')';
+    return $kode . ' (' . $nomor . ')';
   }
 
-  protected function renderPdf(Proyek $proyek, array $groupedItems, string $tanggal, string $path): void
+  protected function renderPdf(Proyek $proyek, array $groupedItems, array $evidenceEntries, string $tanggal, string $path): void
   {
     $pdf = Pdf::loadView('laporan.pdf', [
       'proyek' => $proyek,
       'groupedItems' => $groupedItems,
+      'evidenceEntries' => $evidenceEntries,
       'tanggalUjiTerima' => $tanggal,
-      'fotoCaption' => fn($item, $foto) => $this->fotoCaption($item, $foto),
+      'fotoCaption' => fn($item, $nomor) => $this->fotoCaption($item, $nomor),
     ])->setPaper('a4', 'portrait');
 
     Storage::disk('public')->put($path, $pdf->output());
@@ -99,7 +130,7 @@ class LaporanGenerator
     ]);
   }
 
-  protected function renderWord(Proyek $proyek, array $groupedItems, string $tanggal, string $path): void
+  protected function renderWord(Proyek $proyek, array $groupedItems, array $evidenceEntries, string $tanggal, string $path): void
   {
     $phpWord = new PhpWord();
     $section = $phpWord->addSection([
@@ -228,16 +259,7 @@ class LaporanGenerator
 
     $this->addDivider($section);
 
-    $allFotos = [];
-    foreach ($groupedItems as $group) {
-      foreach ($group['items'] as $item) {
-        foreach ($item->fotoBukti as $foto) {
-          $allFotos[] = ['item' => $item, 'foto' => $foto];
-        }
-      }
-    }
-
-    foreach (array_chunk($allFotos, 3) as $row) {
+    foreach (array_chunk($evidenceEntries, 3) as $row) {
       $gridTable = $section->addTable([
         'borderSize' => 6,
         'borderColor' => '333333',
@@ -248,15 +270,27 @@ class LaporanGenerator
 
       foreach ($row as $entry) {
         $cell = $gridTable->addCell(3000);
-        $fullPath = storage_path('app/public/' . $entry['foto']->file_path);
 
-        if (file_exists($fullPath)) {
-          $cell->addImage($fullPath, ['width' => 140, 'height' => 100, 'alignment' => Jc::CENTER]);
+        if ($entry['foto'] === null) {
+          // Slot foto yang belum diunggah: tandai jelas di laporan
+          $cell->addTextBreak(2);
+          $cell->addText(
+            'FOTO BELUM LENGKAP',
+            ['bold' => true, 'color' => 'C0392B', 'size' => 10],
+            ['alignment' => Jc::CENTER]
+          );
+          $cell->addTextBreak(1);
+        } else {
+          $fullPath = storage_path('app/public/' . $entry['foto']->file_path);
+
+          if (file_exists($fullPath)) {
+            $cell->addImage($fullPath, ['width' => 140, 'height' => 100, 'alignment' => Jc::CENTER]);
+          }
         }
 
         $cell->addText('STO: ' . $proyek->sto, ['size' => 8]);
         $cell->addText('LOKASI: ' . $proyek->lokasi, ['size' => 8]);
-        $cell->addText('ITEM: ' . $this->fotoCaption($entry['item'], $entry['foto']), ['size' => 8]);
+        $cell->addText('ITEM: ' . $this->fotoCaption($entry['item'], $entry['nomor']), ['size' => 8]);
         $cell->addText('MITRA: ' . $proyek->pelaksana, ['size' => 8]);
       }
 

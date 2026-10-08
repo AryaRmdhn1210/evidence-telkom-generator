@@ -67,6 +67,17 @@
       border: 1px solid #ccc;
     }
 
+    .foto-kosong {
+      height: 110px;
+      line-height: 110px;
+      text-align: center;
+      font-size: 10px;
+      font-weight: bold;
+      color: #C0392B;
+      background: #FDEDEC;
+      border: 1px dashed #C0392B;
+    }
+
     .caption-table {
       width: 100%;
       font-size: 9px;
@@ -257,15 +268,7 @@
   <hr class="divider">
 
   @php
-  $allFotos = [];
-  foreach ($groupedItems as $group) {
-  foreach ($group['items'] as $item) {
-  foreach ($item->fotoBukti as $foto) {
-  $allFotos[] = ['item' => $item, 'foto' => $foto];
-  }
-  }
-  }
-  $chunks = array_chunk($allFotos, 3);
+  $chunks = array_chunk($evidenceEntries, 3);
   @endphp
 
   @foreach ($chunks as $row)
@@ -273,7 +276,11 @@
     <tr>
       @foreach ($row as $entry)
       <td class="foto-cell">
+        @if ($entry['foto'])
         <img src="{{ storage_path('app/public/' . $entry['foto']->file_path) }}">
+        @else
+        <div class="foto-kosong">FOTO BELUM LENGKAP</div>
+        @endif
         <table class="caption-table">
           <tr>
             <td>STO</td>
@@ -285,7 +292,7 @@
           </tr>
           <tr>
             <td>ITEM</td>
-            <td>{{ $fotoCaption($entry['item'], $entry['foto']) }}</td>
+            <td>{{ $fotoCaption($entry['item'], $entry['nomor']) }}</td>
           </tr>
           <tr>
             <td>MITRA</td>
