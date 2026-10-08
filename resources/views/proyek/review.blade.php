@@ -75,10 +75,17 @@
       </div>
 
       <div class="p-6 bg-white rounded shadow">
+        @can('update', $proyek)
         @if (Auth::user()->role === 'admin')
         @if (!$semuaLengkap)
-        <div class="p-3 mb-4 text-sm text-yellow-700 bg-yellow-100 rounded">
-          Masih ada {{ $itemKurang }} item yang fotonya belum lengkap. Sebagai admin, kamu tetap bisa generate laporan — item yang kurang akan ditandai khusus di laporan.
+        <div class="flex gap-3 p-4 mb-4 text-sm border-l-4 rounded border-amber-500 bg-amber-50 text-amber-900">
+          <svg class="w-6 h-6 mt-0.5 shrink-0 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+          </svg>
+          <div>
+            <p class="font-semibold">Peringatan: {{ $itemKurang }} item belum lengkap fotonya.</p>
+            <p class="mt-1">Sebagai admin, kamu tetap bisa generate laporan — item yang kurang akan ditandai <strong>"FOTO BELUM LENGKAP"</strong> di halaman evidence laporan PDF dan Word.</p>
+          </div>
         </div>
         @endif
         <div class="flex justify-end">
@@ -89,8 +96,14 @@
         </div>
         @else
         @if (!$semuaLengkap)
-        <div class="p-3 mb-4 text-sm text-yellow-700 bg-yellow-100 rounded">
-          Masih ada {{ $itemKurang }} item yang fotonya belum lengkap. Lengkapi dulu semua foto sebelum bisa generate laporan.
+        <div class="flex gap-3 p-4 mb-4 text-sm text-red-900 border-l-4 border-red-600 rounded bg-red-50">
+          <svg class="w-6 h-6 mt-0.5 shrink-0 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+          </svg>
+          <div>
+            <p class="font-semibold">Belum bisa generate: {{ $itemKurang }} item belum lengkap fotonya.</p>
+            <p class="mt-1">Lengkapi dulu semua foto sebelum bisa generate laporan.</p>
+          </div>
         </div>
         <div class="flex justify-end">
           <button type="button" disabled
@@ -107,6 +120,11 @@
         </div>
         @endif
         @endif
+        @else
+        <div class="p-3 text-sm text-blue-800 border border-blue-200 rounded bg-blue-50">
+          Proyek ini milik <strong>{{ $proyek->pembuat->name ?? '-' }}</strong>. Hanya pembuat proyek dan admin yang dapat melengkapi foto dan men-generate laporan.
+        </div>
+        @endcan
       </div>
 
       <div>

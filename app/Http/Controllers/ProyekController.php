@@ -3,11 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProyekRequest;
+use App\Models\Laporan;
 use App\Models\Proyek;
-use Illuminate\Support\Facades\Storage;
 use App\Services\LaporanGenerator;
 use Illuminate\Http\Request;
-use App\Models\Laporan;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 
 class ProyekController extends Controller
 {
@@ -31,7 +32,9 @@ class ProyekController extends Controller
 
   public function show(Proyek $proyek)
   {
-    $proyek->load(['itemProyek.katalogItem', 'itemProyek.fotoBukti']);
+    Gate::authorize('view', $proyek);
+
+    $proyek->load(['pembuat', 'itemProyek.katalogItem', 'itemProyek.fotoBukti']);
 
     return view('proyek.show', compact('proyek'));
   }
@@ -66,11 +69,15 @@ class ProyekController extends Controller
 
   public function edit(Proyek $proyek)
   {
+    Gate::authorize('update', $proyek);
+
     return view('proyek.edit', compact('proyek'));
   }
 
   public function update(ProyekRequest $request, Proyek $proyek)
   {
+    Gate::authorize('update', $proyek);
+
     $validated = $request->safe()->except(['ttd_tim_uji_terima', 'ttd_pelaksana']);
     $proyek->fill($validated);
 
@@ -98,6 +105,8 @@ class ProyekController extends Controller
 
   public function destroy(Proyek $proyek)
   {
+    Gate::authorize('delete', $proyek);
+
     $proyek->delete();
 
     return redirect()->route('proyek.index')
@@ -106,7 +115,9 @@ class ProyekController extends Controller
 
   public function review(Proyek $proyek)
   {
-    $proyek->load(['itemProyek.katalogItem', 'itemProyek.fotoBukti']);
+    Gate::authorize('view', $proyek);
+
+    $proyek->load(['pembuat', 'itemProyek.katalogItem', 'itemProyek.fotoBukti']);
 
     $totalItem = $proyek->itemProyek->count();
     $itemLengkap = $proyek->itemProyek->where('status_lengkap', true)->count();
@@ -118,6 +129,8 @@ class ProyekController extends Controller
 
   public function generate(Proyek $proyek)
   {
+    Gate::authorize('update', $proyek);
+
     $proyek->load([
       'itemProyek.katalogItem',
       'itemProyek.fotoBukti',
@@ -134,6 +147,8 @@ class ProyekController extends Controller
 
   public function generateStore(Request $request, Proyek $proyek, LaporanGenerator $generator)
   {
+    Gate::authorize('update', $proyek);
+
     $proyek->loadMissing('itemProyek.fotoBukti');
 
     if (auth()->user()->role !== 'admin') {
@@ -155,6 +170,8 @@ class ProyekController extends Controller
 
   public function destroyLaporan(Proyek $proyek, Laporan $laporan)
   {
+    Gate::authorize('update', $proyek);
+
     if ($laporan->proyek_id !== $proyek->id) {
       abort(404);
     }

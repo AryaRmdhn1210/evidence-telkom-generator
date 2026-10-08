@@ -7,12 +7,24 @@ use App\Models\KatalogItem;
 use App\Models\ItemProyek;
 use App\Models\Proyek;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 
 class ItemProyekController extends Controller
 {
+  /**
+   * Pastikan item yang diakses memang bagian dari proyek di URL,
+   * supaya izin di satu proyek tidak bisa dipakai untuk mengubah item proyek lain.
+   */
+  protected function pastikanItemMilikProyek(Proyek $proyek, ItemProyek $itemProyek): void
+  {
+    abort_if((int) $itemProyek->proyek_id !== (int) $proyek->id, 404);
+  }
+
   public function create(Proyek $proyek)
   {
+    Gate::authorize('update', $proyek);
+
     $katalogItems = KatalogItem::orderBy('uraian_pekerjaan')->get();
 
     return view('proyek.item.create', compact('proyek', 'katalogItems'));
@@ -20,6 +32,8 @@ class ItemProyekController extends Controller
 
   public function store(Request $request, Proyek $proyek)
   {
+    Gate::authorize('update', $proyek);
+
     $validated = $request->validate([
       'mode' => ['required', 'in:existing,baru'],
       'katalog_item_id' => ['required_if:mode,existing', 'nullable', 'exists:katalog_item,id'],
@@ -65,6 +79,9 @@ class ItemProyekController extends Controller
 
   public function upload(Proyek $proyek, ItemProyek $itemProyek)
   {
+    Gate::authorize('update', $proyek);
+    $this->pastikanItemMilikProyek($proyek, $itemProyek);
+
     $itemProyek->load('katalogItem', 'fotoBukti');
 
     return view('proyek.item.upload', compact('proyek', 'itemProyek'));
@@ -72,6 +89,9 @@ class ItemProyekController extends Controller
 
   public function storeFoto(Request $request, Proyek $proyek, ItemProyek $itemProyek)
   {
+    Gate::authorize('update', $proyek);
+    $this->pastikanItemMilikProyek($proyek, $itemProyek);
+
     $request->validate([
       'foto' => ['required', 'array'],
       'foto.*' => ['image', 'max:5120'],
@@ -99,7 +119,10 @@ class ItemProyekController extends Controller
 
   public function destroyFoto(Proyek $proyek, ItemProyek $itemProyek, FotoBukti $foto)
   {
-    if ($foto->item_proyek_id !== $itemProyek->id) {
+    Gate::authorize('update', $proyek);
+    $this->pastikanItemMilikProyek($proyek, $itemProyek);
+
+    if ((int) $foto->item_proyek_id !== (int) $itemProyek->id) {
       abort(404);
     }
 
@@ -111,6 +134,9 @@ class ItemProyekController extends Controller
 
   public function destroy(Proyek $proyek, ItemProyek $itemProyek)
   {
+    Gate::authorize('update', $proyek);
+    $this->pastikanItemMilikProyek($proyek, $itemProyek);
+
     foreach ($itemProyek->fotoBukti as $foto) {
       Storage::disk('public')->delete($foto->file_path);
     }

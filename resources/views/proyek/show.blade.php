@@ -10,6 +10,13 @@
 
       <x-flash-message />
 
+      @cannot('update', $proyek)
+      <div class="p-3 text-sm text-blue-800 border border-blue-200 rounded bg-blue-50">
+        Kamu sedang melihat proyek milik <strong>{{ $proyek->pembuat->name ?? '-' }}</strong> (mode lihat saja).
+        Hanya pembuat proyek dan admin yang dapat mengubah item, foto, dan laporan.
+      </div>
+      @endcannot
+
       <div class="p-6 bg-white rounded shadow">
         <dl class="grid grid-cols-2 gap-4 text-sm">
           <div>
@@ -32,15 +39,21 @@
             <dt class="text-gray-500">Pelaksana</dt>
             <dd>{{ $proyek->pelaksana }}</dd>
           </div>
+          <div>
+            <dt class="text-gray-500">Dibuat Oleh</dt>
+            <dd>{{ $proyek->pembuat->name ?? '-' }}</dd>
+          </div>
         </dl>
       </div>
 
       <div class="flex items-center justify-between">
         <h3 class="font-semibold text-gray-700">Item Pekerjaan</h3>
+        @can('update', $proyek)
         <a href="{{ route('proyek.item.create', $proyek) }}"
           class="px-4 py-2 text-sm text-white bg-red-600 rounded hover:bg-red-700">
           + Tambah Item
         </a>
+        @endcan
       </div>
 
       <div class="overflow-hidden bg-white rounded shadow">
@@ -81,6 +94,7 @@
                   @endif
                 </td>
                 <td class="px-4 py-3 space-x-3">
+                  @can('update', $proyek)
                   <a href="{{ route('proyek.item.upload', [$proyek, $item]) }}" class="inline-flex items-center gap-1 text-indigo-600 hover:underline">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
@@ -98,12 +112,19 @@
                       Hapus
                     </button>
                   </form>
+                  @else
+                  <span class="text-xs text-gray-400">Lihat saja</span>
+                  @endcan
                 </td>
               </tr>
               @empty
               <tr>
                 <td colspan="7" class="px-4 py-6 text-center text-gray-500">
+                  @can('update', $proyek)
                   Belum ada item. Klik "+ Tambah Item" untuk mulai.
+                  @else
+                  Proyek ini belum memiliki item.
+                  @endcan
                 </td>
               </tr>
               @endforelse
