@@ -2,9 +2,11 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -34,6 +36,7 @@ class LoginRequest extends FormRequest
 
     /**
      * Attempt to authenticate the request's credentials.
+     * Akun yang dinonaktifkan tidak bisa login.
      *
      * @throws \Illuminate\Validation\ValidationException
      */
@@ -41,8 +44,23 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('username', 'password'), $this->boolean('remember'))) {
+        $credentials = $this->only('username', 'password');
+
+        if (! Auth::attempt($credentials + ['aktif' => true], $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
+
+            // Pesan khusus hanya diberikan kalau password-nya benar tetapi akun dinonaktifkan,
+            // supaya orang lain tidak bisa menebak username mana yang valid.
+            $user = User::where('username', $credentials['username'] ?? '')->first();
+
+            if (
+                $user && $user->aktif === false
+                && Hash::check((string) ($credentials['password'] ?? ''), $user->password)
+            ) {
+                throw ValidationException::withMessages([
+                    'username' => 'Akun Anda telah dinonaktifkan. Hubungi admin.',
+                ]);
+            }
 
             throw ValidationException::withMessages([
                 'username' => trans('auth.failed'),

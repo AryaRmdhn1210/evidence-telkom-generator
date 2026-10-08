@@ -13,11 +13,14 @@ class UserManagementController extends Controller
     {
         $search = $request->get('search');
 
-        $users = User::when($search, function ($q) use ($search) {
-            $q->where('name', 'like', "%{$search}%")
-                ->orWhere('username', 'like', "%{$search}%")
-                ->orWhere('email', 'like', "%{$search}%");
-        })
+        $users = User::withCount(['proyek', 'laporan'])
+            ->when($search, function ($q) use ($search) {
+                $q->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('username', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                });
+            })
             ->orderBy('name')
             ->paginate(10)
             ->withQueryString();
@@ -67,6 +70,13 @@ class UserManagementController extends Controller
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
         ]);
 
+        // Admin tidak boleh mengubah role akunnya sendiri (mencegah sistem tanpa admin)
+        if ($user->id === auth()->id() && $validated['role'] !== $user->role) {
+            return back()
+                ->withErrors(['role' => 'Tidak bisa mengubah role akun sendiri.'])
+                ->withInput();
+        }
+
         $user->name = $validated['name'];
         $user->username = $validated['username'];
         $user->email = $validated['email'];
@@ -82,11 +92,38 @@ class UserManagementController extends Controller
             ->with('status', 'Data user berhasil diperbarui.');
     }
 
+    /**
+     * Aktifkan atau nonaktifkan akun. Data proyek dan laporan tetap utuh.
+     */
+    public function toggleAktif(User $user)
+    {
+        if ($user->id === auth()->id()) {
+            return redirect()->route('admin.users.index')
+                ->with('error', 'Tidak bisa menonaktifkan akun sendiri.');
+        }
+
+        $user->aktif = ! $user->aktif;
+        $user->save();
+
+        return redirect()->route('admin.users.index')
+            ->with('status', $user->aktif
+                ? 'Akun ' . $user->name . ' diaktifkan kembali.'
+                : 'Akun ' . $user->name . ' dinonaktifkan. Data proyeknya tetap tersimpan.');
+    }
+
+    /**
+     * Hapus permanen hanya untuk akun yang belum punya data.
+     */
     public function destroy(User $user)
     {
         if ($user->id === auth()->id()) {
             return redirect()->route('admin.users.index')
                 ->with('error', 'Tidak bisa menghapus akun sendiri.');
+        }
+
+        if ($user->proyek()->exists() || $user->laporan()->exists()) {
+            return redirect()->route('admin.users.index')
+                ->with('error', 'Akun ini sudah memiliki data proyek atau laporan, jadi tidak bisa dihapus. Nonaktifkan saja.');
         }
 
         $user->delete();
