@@ -4,9 +4,15 @@
 <head>
   <meta charset="utf-8">
   <style>
+    /* Ruang kosong di atas (kop) dan bawah (footer) berlaku di SETIAP halaman */
+    @page {
+      margin: 100px 40px 80px 40px;
+    }
+
     body {
       font-family: Arial, sans-serif;
       font-size: 11px;
+      margin: 0;
     }
 
     table {
@@ -14,9 +20,12 @@
       border-collapse: collapse;
     }
 
-    .info-table td {
-      padding: 2px 6px;
-      vertical-align: top;
+    thead {
+      display: table-header-group;
+    }
+
+    tr {
+      page-break-inside: avoid;
     }
 
     .boq-table th,
@@ -28,6 +37,48 @@
     .boq-table th {
       background: #FFEB3B;
       color: #000;
+    }
+
+    /* Sel pembungkus info proyek di thead: tanpa border dan tanpa warna kuning */
+    .boq-table th.head-cell,
+    .evidence-table td.head-cell {
+      background: none;
+      border: none;
+      padding: 0;
+      text-align: left;
+      font-weight: normal;
+    }
+
+    /* Info proyek: tanpa kotak, rata kiri, titik dua sejajar dan rapat dengan label */
+    .info-table td,
+    .boq-table .info-table td {
+      border: none;
+      padding: 2px 4px 2px 0;
+      vertical-align: top;
+      text-align: left;
+    }
+
+    .info-table td.lbl {
+      width: 105px;
+    }
+
+    .info-table td.sep {
+      width: 10px;
+    }
+
+    .divider {
+      border: none;
+      border-top: 2px solid #000;
+      height: 0;
+      margin: 0;
+    }
+
+    .divider-top {
+      margin: 0 0 6px;
+    }
+
+    .divider-bottom {
+      margin: 6px 0 12px;
     }
 
     .kategori-row td {
@@ -48,8 +99,7 @@
     }
 
     .evidence-table {
-      border-collapse: collapse;
-      margin-bottom: 10px;
+      table-layout: fixed;
     }
 
     .foto-cell {
@@ -93,72 +143,25 @@
       page-break-before: always;
     }
 
-    .logo-spacer {
-      height: 70px;
-    }
-
-    .footer-spacer {
-      height: 70px;
-    }
-
-    .divider {
-      border: none;
-      border-top: 2px solid #000;
-      margin: 8px 0 14px;
-    }
-
     h1 {
       font-size: 16px;
       text-align: center;
-      margin: 0 0 10px;
+      margin: 0 0 8px;
     }
   </style>
 </head>
 
 <body>
 
-  <div class="logo-spacer"></div>
-
   <h1>BILL OF QUANTITY (BOQ) HASIL UJI TERIMA</h1>
-  <hr class="divider">
-
-  <table class="info-table">
-    <tr>
-      <td>PROYEK</td>
-      <td>:</td>
-      <td>{{ $proyek->nama_proyek }}</td>
-    </tr>
-    <tr>
-      <td>KONTRAK</td>
-      <td>:</td>
-      <td>{{ $proyek->no_kontrak ?: '-' }}</td>
-    </tr>
-    <tr>
-      <td>SURAT PESANAN</td>
-      <td>:</td>
-      <td>{{ $proyek->no_surat_pesanan ?: '-' }}</td>
-    </tr>
-    <tr>
-      <td>WITEL</td>
-      <td>:</td>
-      <td>{{ $proyek->witel ?: '-' }}</td>
-    </tr>
-    <tr>
-      <td>LOKASI</td>
-      <td>:</td>
-      <td>{{ $proyek->lokasi ?: '-' }}</td>
-    </tr>
-    <tr>
-      <td>PELAKSANA</td>
-      <td>:</td>
-      <td>{{ $proyek->pelaksana ?: '-' }}</td>
-    </tr>
-  </table>
-
-  <hr class="divider">
 
   <table class="boq-table">
     <thead>
+      <tr>
+        <th colspan="8" class="head-cell">
+          @include('laporan.partials.info')
+        </th>
+      </tr>
       <tr>
         <th>NO</th>
         <th>DESIGNATOR</th>
@@ -223,91 +226,60 @@
     </tr>
   </table>
 
-  <div class="footer-spacer"></div>
-
   <div class="page-break"></div>
 
-  <div class="logo-spacer"></div>
-
   <h1>EVIDENCE PEKERJAAN</h1>
-  <hr class="divider">
-
-  <table class="info-table">
-    <tr>
-      <td>PROYEK</td>
-      <td>:</td>
-      <td>{{ $proyek->nama_proyek }}</td>
-    </tr>
-    <tr>
-      <td>KONTRAK</td>
-      <td>:</td>
-      <td>{{ $proyek->no_kontrak ?: '-' }}</td>
-    </tr>
-    <tr>
-      <td>SURAT PESANAN</td>
-      <td>:</td>
-      <td>{{ $proyek->no_surat_pesanan ?: '-' }}</td>
-    </tr>
-    <tr>
-      <td>WITEL</td>
-      <td>:</td>
-      <td>{{ $proyek->witel ?: '-' }}</td>
-    </tr>
-    <tr>
-      <td>LOKASI</td>
-      <td>:</td>
-      <td>{{ $proyek->lokasi ?: '-' }}</td>
-    </tr>
-    <tr>
-      <td>PELAKSANA</td>
-      <td>:</td>
-      <td>{{ $proyek->pelaksana ?: '-' }}</td>
-    </tr>
-  </table>
-
-  <hr class="divider">
 
   @php
   $chunks = array_chunk($evidenceEntries, 3);
   @endphp
 
-  @foreach ($chunks as $row)
   <table class="evidence-table">
-    <tr>
-      @foreach ($row as $entry)
-      <td class="foto-cell">
-        @if ($entry['foto'])
-        <img src="{{ storage_path('app/public/' . $entry['foto']->file_path) }}">
-        @else
-        <div class="foto-kosong">FOTO BELUM LENGKAP</div>
-        @endif
-        <table class="caption-table">
-          <tr>
-            <td>STO</td>
-            <td>{{ $proyek->sto }}</td>
-          </tr>
-          <tr>
-            <td>LOKASI</td>
-            <td>{{ $proyek->lokasi }}</td>
-          </tr>
-          <tr>
-            <td>ITEM</td>
-            <td>{{ $fotoCaption($entry['item'], $entry['nomor']) }}</td>
-          </tr>
-          <tr>
-            <td>MITRA</td>
-            <td>{{ $proyek->pelaksana }}</td>
-          </tr>
-        </table>
-      </td>
-      @endforeach
-      @for ($i = count($row); $i < 3; $i++)
-        <td class="foto-cell">
+    <thead>
+      <tr>
+        <td colspan="3" class="head-cell">
+          @include('laporan.partials.info')
         </td>
-        @endfor
-    </tr>
+      </tr>
+    </thead>
+    <tbody>
+      @foreach ($chunks as $row)
+      <tr>
+        @foreach ($row as $entry)
+        <td class="foto-cell">
+          @if ($entry['foto'])
+          <img src="{{ storage_path('app/public/' . $entry['foto']->file_path) }}">
+          @else
+          <div class="foto-kosong">FOTO BELUM LENGKAP</div>
+          @endif
+          <table class="caption-table">
+            <tr>
+              <td>STO</td>
+              <td>{{ $proyek->sto }}</td>
+            </tr>
+            <tr>
+              <td>LOKASI</td>
+              <td>{{ $proyek->lokasi }}</td>
+            </tr>
+            <tr>
+              <td>ITEM</td>
+              <td>{{ $fotoCaption($entry['item'], $entry['nomor']) }}</td>
+            </tr>
+            <tr>
+              <td>MITRA</td>
+              <td>{{ $proyek->pelaksana }}</td>
+            </tr>
+          </table>
+        </td>
+        @endforeach
+        @for ($i = count($row); $i < 3; $i++)
+          <td class="foto-cell">
+          </td>
+          @endfor
+      </tr>
+      @endforeach
+    </tbody>
   </table>
-  @endforeach
 
 </body>
 

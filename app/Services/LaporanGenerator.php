@@ -120,25 +120,56 @@ class LaporanGenerator
     Storage::disk('public')->put($path, $pdf->output());
   }
 
-  protected function addDivider($section): void
+  /**
+   * Baris pertama tabel yang berisi info proyek, diapit garis atas dan bawah.
+   * Ditandai sebagai baris header tabel, jadi otomatis berulang di setiap halaman
+   * tanpa memakai header halaman (header halaman dibiarkan kosong untuk kop/logo).
+   */
+  protected function addInfoRow($table, array $infoRows, int $totalWidth, int $span): void
   {
-    $section->addLine([
-      'weight' => 2,
-      'width' => 460,
-      'height' => 0,
-      'color' => '000000',
+    $table->addRow(null, ['tblHeader' => true, 'cantSplit' => true]);
+
+    $cell = $table->addCell($totalWidth, [
+      'gridSpan' => $span,
+      'borderTopSize' => 12,
+      'borderTopColor' => '000000',
+      'borderBottomSize' => 12,
+      'borderBottomColor' => '000000',
     ]);
+
+    $tight = ['spaceBefore' => 0, 'spaceAfter' => 0];
+
+    // Jarak kecil di atas blok info supaya teks tidak menempel ke garis
+    $cell->addText('', ['size' => 4], $tight);
+
+    // Tabel kecil tanpa border: label, titik dua, dan nilai rata kiri dan sejajar
+    $info = $cell->addTable(['layout' => Table::LAYOUT_FIXED]);
+
+    foreach ($infoRows as [$label, $value]) {
+      $info->addRow();
+      $info->addCell(2000)->addText($label, ['size' => 9], $tight);
+      $info->addCell(250)->addText(':', ['size' => 9], $tight);
+      $info->addCell($totalWidth - 2250 - 200)->addText($value, ['size' => 9], $tight);
+    }
+
+    // Jarak kecil di bawah blok info supaya tidak menempel ke garis
+    $cell->addText('', ['size' => 4], $tight);
   }
 
   protected function renderWord(Proyek $proyek, array $groupedItems, array $evidenceEntries, string $tanggal, string $path): void
   {
     $phpWord = new PhpWord();
-    $section = $phpWord->addSection([
+
+    // Header dan footer halaman sengaja dikosongkan: ruang kop untuk logo yang
+    // ditambahkan manual oleh karyawan. Info proyek ada di baris header tabel.
+    $sectionStyle = [
       'marginLeft' => 720,
       'marginRight' => 720,
-      'marginTop' => 600,
-      'marginBottom' => 600,
-    ]);
+      'marginTop' => 1400,
+      'marginBottom' => 1100,
+      'headerHeight' => 400,
+      'footerHeight' => 400,
+    ];
 
     $infoRows = [
       ['PROYEK', $proyek->nama_proyek],
@@ -149,45 +180,41 @@ class LaporanGenerator
       ['PELAKSANA', $proyek->pelaksana ?: '-'],
     ];
 
-    $section->addTextBreak(2);
+    // ===== Section 1: BOQ =====
+    $section = $phpWord->addSection($sectionStyle);
+    $section->addHeader()->addTextBreak(1);
+    $section->addFooter()->addTextBreak(1);
 
     $section->addText('BILL OF QUANTITY (BOQ) HASIL UJI TERIMA', ['bold' => true, 'size' => 14], ['alignment' => Jc::CENTER]);
-    $this->addDivider($section);
 
-    $infoTable = $section->addTable(['alignment' => Jc::CENTER]);
-    foreach ($infoRows as [$label, $value]) {
-      $infoTable->addRow();
-      $infoTable->addCell(2200)->addText($label);
-      $infoTable->addCell(400)->addText(':');
-      $infoTable->addCell(6400)->addText($value);
-    }
-
-    $this->addDivider($section);
-
-    $colWidths = [600, 1300, 3200, 800, 800, 800, 800, 700];
+    $colWidths = [550, 2250, 2450, 1000, 700, 1100, 1100, 1100];
+    $totalWidth = array_sum($colWidths);
     $headers = ['NO', 'DESIGNATOR', 'URAIAN PEKERJAAN', 'SATUAN', 'DRM', 'AKTUAL', 'TAMBAH', 'KURANG'];
+    $border = ['borderSize' => 6, 'borderColor' => '999999'];
 
     $boqTable = $section->addTable([
-      'borderSize' => 6,
-      'borderColor' => '999999',
       'layout' => Table::LAYOUT_FIXED,
       'alignment' => Jc::CENTER,
     ]);
 
-    $boqTable->addRow();
+    // Baris 1: info proyek (berulang tiap halaman)
+    $this->addInfoRow($boqTable, $infoRows, $totalWidth, count($colWidths));
+
+    // Baris 2: judul kolom (berulang tiap halaman)
+    $boqTable->addRow(null, ['tblHeader' => true, 'cantSplit' => true]);
     foreach ($headers as $i => $head) {
-      $boqTable->addCell($colWidths[$i], ['bgColor' => 'FFEB3B'])
-        ->addText($head, ['bold' => true], ['alignment' => Jc::CENTER]);
+      $boqTable->addCell($colWidths[$i], $border + ['bgColor' => 'FFEB3B'])
+        ->addText($head, ['bold' => true, 'size' => 9], ['alignment' => Jc::CENTER]);
     }
 
     $no = 1;
     foreach ($groupedItems as $group) {
-      $boqTable->addRow();
-      $boqTable->addCell(array_sum($colWidths), ['gridSpan' => 8, 'bgColor' => 'C0392B'])
+      $boqTable->addRow(null, ['cantSplit' => true]);
+      $boqTable->addCell($totalWidth, $border + ['gridSpan' => count($colWidths), 'bgColor' => 'C0392B'])
         ->addText($group['label'] . ' - ' . $group['nama'], ['bold' => true, 'color' => 'FFFFFF']);
 
       foreach ($group['items'] as $item) {
-        $boqTable->addRow();
+        $boqTable->addRow(null, ['cantSplit' => true]);
         $values = [
           (string) $no,
           $item->katalogItem->kode_designator,
@@ -199,7 +226,7 @@ class LaporanGenerator
           $item->qty_kurang > 0 ? (string) $item->qty_kurang : '-',
         ];
         foreach ($values as $i => $val) {
-          $boqTable->addCell($colWidths[$i])->addText($val);
+          $boqTable->addCell($colWidths[$i], $border)->addText($val, ['size' => 9]);
         }
         $no++;
       }
@@ -214,7 +241,7 @@ class LaporanGenerator
     $section->addTextBreak(1);
 
     $sigTable = $section->addTable(['layout' => Table::LAYOUT_FIXED, 'alignment' => Jc::CENTER]);
-    $sigTable->addRow();
+    $sigTable->addRow(null, ['cantSplit' => true]);
 
     $left = $sigTable->addCell(4500);
     $left->addText('TIM UJI TERIMA', ['bold' => true], ['alignment' => Jc::CENTER]);
@@ -244,32 +271,29 @@ class LaporanGenerator
     $right->addText($proyek->nama_pelaksana_ttd ?: '-', [], ['alignment' => Jc::CENTER]);
     $right->addText('NIK: ' . ($proyek->nik_pelaksana_ttd ?: '-'), [], ['alignment' => Jc::CENTER]);
 
-    $section->addPageBreak();
-    $section->addTextBreak(2);
-    $section->addText('EVIDENCE PEKERJAAN', ['bold' => true, 'size' => 14], ['alignment' => Jc::CENTER]);
-    $this->addDivider($section);
+    // ===== Section 2: Evidence (section baru = halaman baru) =====
+    $section2 = $phpWord->addSection($sectionStyle);
+    $section2->addHeader()->addTextBreak(1);
+    $section2->addFooter()->addTextBreak(1);
 
-    $infoTable2 = $section->addTable(['alignment' => Jc::CENTER]);
-    foreach ($infoRows as [$label, $value]) {
-      $infoTable2->addRow();
-      $infoTable2->addCell(2200)->addText($label);
-      $infoTable2->addCell(400)->addText(':');
-      $infoTable2->addCell(6400)->addText($value);
-    }
+    $section2->addText('EVIDENCE PEKERJAAN', ['bold' => true, 'size' => 14], ['alignment' => Jc::CENTER]);
 
-    $this->addDivider($section);
+    $fotoWidth = 3400;
+    $fotoBorder = ['borderSize' => 6, 'borderColor' => '333333'];
+
+    $gridTable = $section2->addTable([
+      'layout' => Table::LAYOUT_FIXED,
+      'alignment' => Jc::CENTER,
+    ]);
+
+    // Baris 1: info proyek (berulang tiap halaman)
+    $this->addInfoRow($gridTable, $infoRows, $fotoWidth * 3, 3);
 
     foreach (array_chunk($evidenceEntries, 3) as $row) {
-      $gridTable = $section->addTable([
-        'borderSize' => 6,
-        'borderColor' => '333333',
-        'layout' => Table::LAYOUT_FIXED,
-        'alignment' => Jc::CENTER,
-      ]);
-      $gridTable->addRow();
+      $gridTable->addRow(null, ['cantSplit' => true]);
 
       foreach ($row as $entry) {
-        $cell = $gridTable->addCell(3000);
+        $cell = $gridTable->addCell($fotoWidth, $fotoBorder);
 
         if ($entry['foto'] === null) {
           // Slot foto yang belum diunggah: tandai jelas di laporan
@@ -295,8 +319,12 @@ class LaporanGenerator
       }
 
       for ($i = count($row); $i < 3; $i++) {
-        $gridTable->addCell(3000)->addText('');
+        $gridTable->addCell($fotoWidth, $fotoBorder)->addText('');
       }
+    }
+
+    if (empty($evidenceEntries)) {
+      $section2->addText('Belum ada foto evidence.', ['italic' => true], ['alignment' => Jc::CENTER]);
     }
 
     $fullWordPath = Storage::disk('public')->path($path);
