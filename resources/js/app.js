@@ -6,6 +6,9 @@ window.Chart = Chart;
 
 Alpine.start();
 
+// Link ke file (unduhan) tidak boleh memicu animasi pindah halaman
+const EKSTENSI_FILE = /\.(pdf|docx?|xlsx?|pptx?|zip|rar|csv|png|jpe?g|gif|webp)$/i;
+
 // Animasi transisi halus antar halaman (fade-out sebelum pindah)
 document.addEventListener('click', (e) => {
     const link = e.target.closest('a');
@@ -14,6 +17,7 @@ document.addEventListener('click', (e) => {
     if (!link.href || link.href.startsWith('javascript:')) return;
     if (link.origin !== window.location.origin) return;
     if (link.getAttribute('href')?.startsWith('#')) return;
+    if (EKSTENSI_FILE.test(link.pathname)) return;
 
     const main = document.querySelector('main');
     if (!main) return;
@@ -24,6 +28,11 @@ document.addEventListener('click', (e) => {
     setTimeout(() => {
         window.location.href = link.href;
     }, 250);
+
+    // Pengaman: kalau halaman ternyata tidak berpindah (misalnya unduhan), tampilkan lagi
+    setTimeout(() => {
+        main.classList.remove('page-fade-out');
+    }, 1500);
 });
 
 // Saat user menekan tombol Back/Forward, browser memulihkan halaman dari cache

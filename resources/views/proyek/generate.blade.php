@@ -73,7 +73,7 @@
                   <a href="{{ asset('storage/' . $lap->file_pdf) }}" target="_blank" class="text-indigo-600 hover:underline">PDF</a>
                   @endif
                   @if ($lap->file_word)
-                  <a href="{{ asset('storage/' . $lap->file_word) }}" class="text-indigo-600 hover:underline">Word</a>
+                  <a href="{{ asset('storage/' . $lap->file_word) }}" download class="text-indigo-600 hover:underline">Word</a>
                   @endif
                 </td>
                 <td class="px-4 py-3">
