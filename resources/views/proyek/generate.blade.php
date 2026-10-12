@@ -70,10 +70,10 @@
                 <td class="px-4 py-3">{{ $lap->created_at->format('d-m-Y H:i') }}</td>
                 <td class="px-4 py-3 space-x-2">
                   @if ($lap->file_pdf)
-                  <a href="{{ asset('storage/' . $lap->file_pdf) }}" target="_blank" class="text-indigo-600 hover:underline">PDF</a>
+                  <a href="{{ asset('storage/' . $lap->file_pdf) }}" target="_blank" class="text-blue-600 hover:underline">PDF</a>
                   @endif
                   @if ($lap->file_word)
-                  <a href="{{ asset('storage/' . $lap->file_word) }}" download class="text-indigo-600 hover:underline">Word</a>
+                  <a href="{{ asset('storage/' . $lap->file_word) }}" download class="text-blue-600 hover:underline">Word</a>
                   @endif
                 </td>
                 <td class="px-4 py-3">
