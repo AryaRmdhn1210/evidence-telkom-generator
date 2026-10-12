@@ -103,7 +103,9 @@
                       Upload Foto
                     </a>
                     <form action="{{ route('proyek.item.destroy', [$proyek, $item]) }}" method="POST" class="inline"
-                      onsubmit="return confirm('Yakin hapus item ini beserta semua fotonya?')">
+                      data-confirm="Hapus item {{ $item->katalogItem->kode_designator }} beserta semua fotonya? Tindakan ini tidak bisa dibatalkan."
+                      data-confirm-title="Hapus Item"
+                      data-confirm-button="Ya, hapus item">
                       @csrf
                       @method('DELETE')
                       <button type="submit" class="inline-flex items-center gap-1 text-red-600 hover:underline">
@@ -115,7 +117,7 @@
                     </form>
                   </div>
                   @else
-                  <span class="text-xs text-gray-400">Lihat saja</span>
+                  <span class="text-xs text-gray-500">Lihat saja</span>
                   @endcan
                 </td>
               </tr>

@@ -72,7 +72,10 @@
 
                                         @unless ($isSelf)
                                         <form action="{{ route('admin.users.aktif', $user) }}" method="POST" class="inline"
-                                            onsubmit="return confirm('{{ $user->aktif ? 'Nonaktifkan akun ini? User tidak bisa login, tapi datanya tetap tersimpan.' : 'Aktifkan kembali akun ini?' }}')">
+                                            data-confirm="{{ $user->aktif ? 'Nonaktifkan akun ' . $user->name . '? User tidak bisa login, tapi datanya tetap tersimpan.' : 'Aktifkan kembali akun ' . $user->name . '?' }}"
+                                            data-confirm-title="{{ $user->aktif ? 'Nonaktifkan Akun' : 'Aktifkan Akun' }}"
+                                            data-confirm-button="{{ $user->aktif ? 'Ya, nonaktifkan' : 'Ya, aktifkan' }}"
+                                            data-confirm-tone="{{ $user->aktif ? 'warning' : 'success' }}">
                                             @csrf
                                             @method('PATCH')
                                             <button type="submit" class="inline-flex items-center gap-1 {{ $user->aktif ? 'text-amber-600' : 'text-green-600' }} hover:underline">
@@ -89,7 +92,9 @@
 
                                         @unless ($punyaData)
                                         <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="inline"
-                                            onsubmit="return confirm('Hapus permanen user ini? Tindakan ini tidak bisa dibatalkan.')">
+                                            data-confirm="Hapus permanen user {{ $user->name }}? Tindakan ini tidak bisa dibatalkan."
+                                            data-confirm-title="Hapus User"
+                                            data-confirm-button="Ya, hapus user">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="inline-flex items-center gap-1 text-red-600 hover:underline">

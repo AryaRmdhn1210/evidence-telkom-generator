@@ -56,7 +56,9 @@
                                             Edit
                                         </a>
                                         <form action="{{ route('admin.katalog.destroy', $item) }}" method="POST" class="inline"
-                                            onsubmit="return confirm('Yakin hapus item katalog ini?')">
+                                            data-confirm="Hapus item katalog {{ $item->kode_designator }}? Tindakan ini tidak bisa dibatalkan."
+                                            data-confirm-title="Hapus Item Katalog"
+                                            data-confirm-button="Ya, hapus item">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="inline-flex items-center gap-1 text-red-600 hover:underline">
@@ -79,7 +81,7 @@
                                         {{ $search ? 'Tidak ada item yang cocok dengan pencarian' : 'Belum ada item katalog' }}
                                     </p>
                                     @unless ($search)
-                                    <p class="mt-1 text-sm text-gray-400">Klik "+ Tambah Item Katalog" untuk mulai.</p>
+                                    <p class="mt-1 text-sm text-gray-500">Klik "+ Tambah Item Katalog" untuk mulai.</p>
                                     @endunless
                                 </td>
                             </tr>

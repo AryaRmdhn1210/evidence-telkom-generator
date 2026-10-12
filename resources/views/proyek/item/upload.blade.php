@@ -32,16 +32,18 @@
             <img src="{{ asset('storage/' . $foto->file_path) }}" class="object-cover w-full rounded aspect-square">
             <form action="{{ route('proyek.item.foto.destroy', [$proyek, $itemProyek, $foto]) }}" method="POST"
               class="absolute top-1 right-1"
-              onsubmit="return confirm('Hapus foto ini?')">
+              data-confirm="Hapus foto nomor {{ $foto->nomor_urut }} dari item {{ $itemProyek->katalogItem->kode_designator }}?"
+              data-confirm-title="Hapus Foto"
+              data-confirm-button="Ya, hapus foto">
               @csrf
               @method('DELETE')
-              <button type="submit" class="w-5 h-5 text-xs leading-none text-white bg-red-600 rounded-full">×</button>
+              <button type="submit" class="w-5 h-5 text-xs leading-none text-white bg-red-600 rounded-full" aria-label="Hapus foto">×</button>
             </form>
           </div>
           @endforeach
 
           @for ($i = 0; $i < ($itemProyek->jumlah_foto_wajib - $itemProyek->fotoBukti->count()); $i++)
-            <div class="flex items-center justify-center text-xs text-gray-400 border-2 border-gray-300 border-dashed rounded aspect-square">
+            <div class="flex items-center justify-center text-xs text-gray-500 border-2 border-gray-300 border-dashed rounded aspect-square">
               kosong
             </div>
             @endfor
@@ -52,7 +54,7 @@
           Semua foto sudah lengkap.
         </div>
         @else
-        <form action="{{ route('proyek.item.upload.store', [$proyek, $itemProyek]) }}" method="POST" enctype="multipart/form-data" x-data="{ loading: false }" @submit="loading = true">
+        <form action="{{ route('proyek.item.upload.store', [$proyek, $itemProyek]) }}" method="POST" enctype="multipart/form-data" x-data="{ loading: false }" @submit="loading = true" @pageshow.window="loading = false">
           @csrf
           <label class="block mb-2 text-sm font-medium text-gray-700">
             Upload foto (bisa pilih banyak sekaligus)

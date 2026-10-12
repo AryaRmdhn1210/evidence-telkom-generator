@@ -4,7 +4,62 @@ import Chart from 'chart.js/auto';
 window.Alpine = Alpine;
 window.Chart = Chart;
 
+// Modal konfirmasi: komponennya dipasang sekali di layout (components/confirm-modal.blade.php)
+Alpine.data('confirmModal', (tones) => ({
+    open: false,
+    form: null,
+    title: 'Konfirmasi',
+    message: '',
+    button: 'Ya, lanjutkan',
+    tone: 'danger',
+    tones,
+    get warna() {
+        return this.tones[this.tone] || this.tones.danger;
+    },
+    show(detail) {
+        this.form = detail.form;
+        this.title = detail.title || 'Konfirmasi';
+        this.message = detail.message || '';
+        this.button = detail.button || 'Ya, lanjutkan';
+        this.tone = detail.tone in this.tones ? detail.tone : 'danger';
+        this.open = true;
+        // Fokus awal ke tombol Batal supaya Enter tidak sengaja menghapus
+        setTimeout(() => this.$refs.batal?.focus(), 20);
+    },
+    close() {
+        this.open = false;
+        this.form = null;
+    },
+    confirm() {
+        const form = this.form;
+        this.close();
+        form?.submit();
+    },
+}));
+
 Alpine.start();
+
+// Form dengan atribut data-confirm ditahan dulu, lalu modal konfirmasi ditampilkan
+document.addEventListener('submit', (e) => {
+    const form = e.target;
+    if (!(form instanceof HTMLFormElement)) return;
+
+    const message = form.dataset.confirm;
+    if (!message) return;
+
+    e.preventDefault();
+    e.stopImmediatePropagation();
+
+    window.dispatchEvent(new CustomEvent('open-confirm', {
+        detail: {
+            form,
+            message,
+            title: form.dataset.confirmTitle,
+            button: form.dataset.confirmButton,
+            tone: form.dataset.confirmTone,
+        },
+    }));
+}, true);
 
 // Link ke file (unduhan) tidak boleh memicu animasi pindah halaman
 const EKSTENSI_FILE = /\.(pdf|docx?|xlsx?|pptx?|zip|rar|csv|png|jpe?g|gif|webp)$/i;

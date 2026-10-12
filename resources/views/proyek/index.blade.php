@@ -55,7 +55,9 @@
                       Edit
                     </a>
                     <form action="{{ route('proyek.destroy', $proyek) }}" method="POST" class="inline"
-                      onsubmit="return confirm('Yakin hapus proyek ini? Semua item dan foto di dalamnya juga akan terhapus.')">
+                      data-confirm="Hapus proyek {{ $proyek->nama_proyek }}? Semua item dan foto di dalamnya juga akan terhapus. Tindakan ini tidak bisa dibatalkan."
+                      data-confirm-title="Hapus Proyek"
+                      data-confirm-button="Ya, hapus proyek">
                       @csrf
                       @method('DELETE')
                       <button type="submit" class="inline-flex items-center gap-1 text-red-600 hover:underline">
@@ -87,7 +89,7 @@
                     {{ $search ? 'Tidak ada proyek yang cocok dengan pencarian' : 'Belum ada proyek' }}
                   </p>
                   @unless ($search)
-                  <p class="mt-1 text-sm text-gray-400">Klik "Buat Proyek Baru" untuk mulai mencatat proyek pertamamu.</p>
+                  <p class="mt-1 text-sm text-gray-500">Klik "Buat Proyek Baru" untuk mulai mencatat proyek pertamamu.</p>
                   @endunless
                 </td>
               </tr>

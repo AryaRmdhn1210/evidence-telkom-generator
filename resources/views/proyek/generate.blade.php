@@ -26,7 +26,7 @@
         @endif
 
         @if ($semuaLengkap || Auth::user()->role === 'admin')
-        <form method="POST" action="{{ route('proyek.generate.store', $proyek) }}" x-data="{ loading: false }" @submit="loading = true">
+        <form method="POST" action="{{ route('proyek.generate.store', $proyek) }}" x-data="{ loading: false }" @submit="loading = true" @pageshow.window="loading = false">
           @csrf
           <label class="block mb-1 text-sm font-medium text-gray-700">Tanggal Uji Terima</label>
           <input type="date" name="tanggal_uji_terima" value="{{ old('tanggal_uji_terima', now()->format('Y-m-d')) }}"
@@ -78,7 +78,9 @@
                 </td>
                 <td class="px-4 py-3">
                   <form action="{{ route('proyek.laporan.destroy', [$proyek, $lap]) }}" method="POST"
-                    onsubmit="return confirm('Yakin hapus riwayat laporan ini beserta file PDF dan Word-nya?')">
+                    data-confirm="Hapus riwayat laporan tanggal uji terima {{ $lap->tanggal_uji_terima->format('d-m-Y') }} beserta file PDF dan Word-nya? Tindakan ini tidak bisa dibatalkan."
+                    data-confirm-title="Hapus Riwayat Laporan"
+                    data-confirm-button="Ya, hapus laporan">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="inline-flex items-center gap-1 text-red-600 hover:underline">
