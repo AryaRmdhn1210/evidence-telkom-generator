@@ -11,9 +11,10 @@
             <x-flash-message />
 
             <div class="flex flex-col gap-3 mb-4 sm:flex-row sm:items-center sm:justify-between">
-                <form method="GET" class="flex-1 max-w-sm">
+                <form method="GET" class="flex flex-wrap items-center flex-1 gap-3">
                     <input type="text" name="search" value="{{ $search }}" placeholder="Cari kode, uraian, atau kategori..."
-                        class="w-full text-sm border-gray-300 rounded" onchange="this.form.submit()">
+                        class="w-full text-sm border-gray-300 rounded sm:w-80" onchange="this.form.submit()">
+                    <x-per-page :current="$perPage" />
                 </form>
                 <a href="{{ route('admin.katalog.create') }}"
                     class="px-4 py-2 text-sm text-center text-white bg-red-600 rounded hover:bg-red-700">
@@ -46,24 +47,26 @@
                                         {{ $item->item_proyek_count }}x
                                     </span>
                                 </td>
-                                <td class="px-4 py-3 space-x-3">
-                                    <a href="{{ route('admin.katalog.edit', $item) }}" class="inline-flex items-center gap-1 text-indigo-600 hover:underline">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                        </svg>
-                                        Edit
-                                    </a>
-                                    <form action="{{ route('admin.katalog.destroy', $item) }}" method="POST" class="inline"
-                                        onsubmit="return confirm('Yakin hapus item katalog ini?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="inline-flex items-center gap-1 text-red-600 hover:underline">
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <div class="flex items-center gap-4">
+                                        <a href="{{ route('admin.katalog.edit', $item) }}" class="inline-flex items-center gap-1 text-blue-600 hover:underline">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                             </svg>
-                                            Hapus
-                                        </button>
-                                    </form>
+                                            Edit
+                                        </a>
+                                        <form action="{{ route('admin.katalog.destroy', $item) }}" method="POST" class="inline"
+                                            onsubmit="return confirm('Yakin hapus item katalog ini?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="inline-flex items-center gap-1 text-red-600 hover:underline">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                                Hapus
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                             @empty
@@ -86,7 +89,14 @@
                 </div>
             </div>
 
-            <div class="mt-4">
+            <div class="flex flex-col items-center justify-between gap-3 mt-4 sm:flex-row">
+                <p class="text-sm text-gray-600">
+                    @if ($items->total() > 0)
+                    Menampilkan {{ $items->firstItem() }}-{{ $items->lastItem() }} dari {{ $items->total() }} item
+                    @else
+                    Tidak ada data
+                    @endif
+                </p>
                 {{ $items->links() }}
             </div>
         </div>

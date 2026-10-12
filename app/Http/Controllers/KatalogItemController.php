@@ -10,18 +10,21 @@ class KatalogItemController extends Controller
     public function index(Request $request)
     {
         $search = $request->get('search');
+        $perPage = $this->perHalaman($request);
 
         $items = KatalogItem::when($search, function ($q) use ($search) {
+            $q->where(function ($q) use ($search) {
                 $q->where('kode_designator', 'like', "%{$search}%")
-                  ->orWhere('uraian_pekerjaan', 'like', "%{$search}%")
-                  ->orWhere('kategori_pekerjaan', 'like', "%{$search}%");
-            })
+                    ->orWhere('uraian_pekerjaan', 'like', "%{$search}%")
+                    ->orWhere('kategori_pekerjaan', 'like', "%{$search}%");
+            });
+        })
             ->withCount('itemProyek')
             ->orderBy('kode_designator')
-            ->paginate(15)
+            ->paginate($perPage)
             ->withQueryString();
 
-        return view('admin.katalog.index', compact('items', 'search'));
+        return view('admin.katalog.index', compact('items', 'search', 'perPage'));
     }
 
     public function create()

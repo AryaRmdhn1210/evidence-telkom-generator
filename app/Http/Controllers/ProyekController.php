@@ -15,19 +15,22 @@ class ProyekController extends Controller
   public function index(Request $request)
   {
     $search = $request->get('search');
+    $perPage = $this->perHalaman($request);
 
     $proyeks = Proyek::with('pembuat')
       ->when($search, function ($q) use ($search) {
-        $q->where('nama_proyek', 'like', "%{$search}%")
-          ->orWhere('witel', 'like', "%{$search}%")
-          ->orWhere('lokasi', 'like', "%{$search}%")
-          ->orWhere('sto', 'like', "%{$search}%");
+        $q->where(function ($q) use ($search) {
+          $q->where('nama_proyek', 'like', "%{$search}%")
+            ->orWhere('witel', 'like', "%{$search}%")
+            ->orWhere('lokasi', 'like', "%{$search}%")
+            ->orWhere('sto', 'like', "%{$search}%");
+        });
       })
       ->latest()
-      ->paginate(10)
+      ->paginate($perPage)
       ->withQueryString();
 
-    return view('proyek.index', compact('proyeks', 'search'));
+    return view('proyek.index', compact('proyeks', 'search', 'perPage'));
   }
 
   public function show(Proyek $proyek)
