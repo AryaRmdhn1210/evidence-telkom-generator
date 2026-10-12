@@ -46,7 +46,7 @@ $bgUrl = asset('images/login-bg.jpg');
         </div>
         @endif
 
-        <form method="POST" action="{{ route('login') }}" class="space-y-5">
+        <form method="POST" action="{{ route('login') }}" class="space-y-5" x-data="{ loading: false }" @submit="loading = true" @pageshow.window="loading = false">
             @csrf
 
             <div>
@@ -59,7 +59,7 @@ $bgUrl = asset('images/login-bg.jpg');
                     </span>
                     <input type="text" name="username" value="{{ old('username') }}" required autofocus autocomplete="username"
                         placeholder="Masukkan username"
-                        class="w-full py-3 pr-4 text-gray-900 placeholder-gray-400 bg-white rounded-full pl-11 focus:outline-none focus:ring-2 focus:ring-red-500">
+                        class="w-full py-3 pr-4 text-gray-900 placeholder-gray-500 bg-white rounded-full pl-11 focus:outline-none focus:ring-2 focus:ring-red-500">
                 </div>
             </div>
 
@@ -75,11 +75,11 @@ $bgUrl = asset('images/login-bg.jpg');
                     <input type="password" :type="show ? 'text' : 'password'" name="password" required
                         autocomplete="current-password"
                         placeholder="Masukkan password"
-                        class="w-full py-3 text-gray-900 placeholder-gray-400 bg-white rounded-full pr-11 pl-11 focus:outline-none focus:ring-2 focus:ring-red-500">
+                        class="w-full py-3 text-gray-900 placeholder-gray-500 bg-white rounded-full pr-11 pl-11 focus:outline-none focus:ring-2 focus:ring-red-500">
                     <button type="button" @click="show = !show"
                         :aria-label="show ? 'Sembunyikan password' : 'Tampilkan password'"
                         :title="show ? 'Sembunyikan password' : 'Tampilkan password'"
-                        class="absolute inset-y-0 flex items-center text-gray-400 right-4 hover:text-gray-600">
+                        class="absolute inset-y-0 flex items-center text-gray-500 right-4 hover:text-gray-700">
                         <svg x-show="!show" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -96,12 +96,16 @@ $bgUrl = asset('images/login-bg.jpg');
                 Ingat saya
             </label>
 
-            <button type="submit"
-                class="flex items-center justify-center w-full gap-2 py-3 font-semibold text-white transition rounded-full bg-gradient-to-r from-red-600 to-red-400 hover:from-red-700 hover:to-red-500">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <button type="submit" :disabled="loading"
+                class="flex items-center justify-center w-full gap-2 py-3 font-semibold text-white transition rounded-full bg-gradient-to-r from-red-600 to-red-400 hover:from-red-700 hover:to-red-500 disabled:opacity-60 disabled:cursor-not-allowed">
+                <svg x-show="loading" x-cloak class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                </svg>
+                <svg x-show="!loading" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" style="transform: scaleX(-1); transform-origin: center;" />
                 </svg>
-                Login
+                <span x-text="loading ? 'Memproses...' : 'Login'"></span>
             </button>
         </form>
 
