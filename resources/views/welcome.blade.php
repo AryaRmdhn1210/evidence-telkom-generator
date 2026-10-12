@@ -7,7 +7,7 @@
     <title>Evidence Telkom Generator | PT Telkom Akses Banjarmasin</title>
     @include('partials.favicon')
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=ibm-plex-sans:400,500,600,700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
@@ -44,7 +44,7 @@ $peran = [
 @endphp
 
 <body class="text-gray-900 bg-red-50/40"
-    style="font-family: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;">
+    style="font-family: 'Figtree', ui-sans-serif, system-ui, sans-serif;">
 
     <!-- Header: card memanjang kiri-kanan -->
     <header class="sticky top-0 z-50 border-b border-red-100 shadow-sm bg-white/90 backdrop-blur">

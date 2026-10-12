@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login | Evidence Telkom Generator</title>
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=ibm-plex-sans:400,500,600,700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 @php
@@ -14,7 +14,7 @@ $bgUrl = asset('images/login-bg.jpg');
 @endphp
 
 <body class="relative flex items-center justify-center min-h-screen bg-gray-900"
-    style="font-family: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;">
+    style="font-family: 'Figtree', ui-sans-serif, system-ui, sans-serif;">
 
     <div class="absolute inset-0 scale-105 bg-center bg-cover"
         style="background-image: url('{{ $bgUrl }}'); filter: blur(2px);">
