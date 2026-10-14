@@ -28,6 +28,8 @@ Route::middleware('auth')->group(function () {
     Route::prefix('proyek/{proyek}/item')->name('proyek.item.')->group(function () {
         Route::get('/create', [ItemProyekController::class, 'create'])->name('create');
         Route::post('/', [ItemProyekController::class, 'store'])->name('store');
+        Route::get('/{itemProyek}/edit', [ItemProyekController::class, 'edit'])->name('edit');
+        Route::put('/{itemProyek}', [ItemProyekController::class, 'update'])->name('update');
         Route::get('/{itemProyek}/upload', [ItemProyekController::class, 'upload'])->name('upload');
         Route::post('/{itemProyek}/upload', [ItemProyekController::class, 'storeFoto'])->name('upload.store');
         Route::delete('/{itemProyek}/foto/{foto}', [ItemProyekController::class, 'destroyFoto'])->name('foto.destroy');

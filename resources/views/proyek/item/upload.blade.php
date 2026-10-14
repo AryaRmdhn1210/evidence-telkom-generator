@@ -1,3 +1,6 @@
+@php
+$sisaSlot = max($itemProyek->jumlah_foto_wajib - $itemProyek->fotoBukti->count(), 0);
+@endphp
 <x-app-layout>
   <x-slot name="header">
     <h2 class="text-xl font-semibold leading-tight text-gray-800">
@@ -42,7 +45,7 @@
           </div>
           @endforeach
 
-          @for ($i = 0; $i < ($itemProyek->jumlah_foto_wajib - $itemProyek->fotoBukti->count()); $i++)
+          @for ($i = 0; $i < $sisaSlot; $i++)
             <div class="flex items-center justify-center text-xs text-gray-500 border-2 border-gray-300 border-dashed rounded aspect-square">
               kosong
             </div>
@@ -54,13 +57,30 @@
           Semua foto sudah lengkap.
         </div>
         @else
-        <form action="{{ route('proyek.item.upload.store', [$proyek, $itemProyek]) }}" method="POST" enctype="multipart/form-data" x-data="{ loading: false }" @submit="loading = true" @pageshow.window="loading = false">
+        <form action="{{ route('proyek.item.upload.store', [$proyek, $itemProyek]) }}" method="POST" enctype="multipart/form-data"
+          x-data="{ loading: false, sisa: {{ $sisaSlot }}, dipilih: 0, terlaluBesar: 0 }"
+          @submit="loading = true" @pageshow.window="loading = false">
           @csrf
           <label class="block mb-2 text-sm font-medium text-gray-700">
             Upload foto (bisa pilih banyak sekaligus)
           </label>
-          <input type="file" name="foto[]" multiple accept="image/*" class="block w-full mb-4">
-          <button type="submit" :disabled="loading"
+          <input type="file" name="foto[]" multiple accept="image/*" class="block w-full mb-2"
+            @change="dipilih = $event.target.files.length; terlaluBesar = Array.from($event.target.files).filter(f => f.size > 5 * 1024 * 1024).length">
+
+          <p x-show="dipilih === 0" class="mb-4 text-xs text-gray-500">
+            Slot tersisa: {{ $sisaSlot }} foto. Ukuran maksimal 5 MB per foto.
+          </p>
+          <p x-show="dipilih > 0 && dipilih <= sisa && terlaluBesar === 0" x-cloak class="mb-4 text-sm text-green-700">
+            Terpilih <span x-text="dipilih"></span> foto dari <span x-text="sisa"></span> slot tersisa.
+          </p>
+          <p x-show="dipilih > sisa" x-cloak class="mb-4 text-sm text-red-700">
+            Terpilih <span x-text="dipilih"></span> foto, tetapi slot tersisa hanya <span x-text="sisa"></span>. Kurangi pilihan fotonya.
+          </p>
+          <p x-show="terlaluBesar > 0" x-cloak class="mb-4 text-sm text-red-700">
+            <span x-text="terlaluBesar"></span> foto melebihi 5 MB. Pilih foto yang lebih kecil.
+          </p>
+
+          <button type="submit" :disabled="loading || dipilih === 0 || dipilih > sisa || terlaluBesar > 0"
             class="inline-flex items-center gap-2 px-4 py-2 text-white bg-red-600 rounded hover:bg-red-700 disabled:opacity-60 disabled:cursor-not-allowed">
             <svg x-show="loading" x-cloak class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>

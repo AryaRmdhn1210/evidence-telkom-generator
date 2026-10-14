@@ -21,6 +21,38 @@ class ItemProyekController extends Controller
     abort_if((int) $itemProyek->proyek_id !== (int) $proyek->id, 404);
   }
 
+  /** Pesan validasi form item dalam bahasa Indonesia */
+  protected function pesanItem(): array
+  {
+    return [
+      'required' => ':attribute wajib diisi.',
+      'required_if' => ':attribute wajib diisi.',
+      'integer' => ':attribute harus berupa angka bulat.',
+      'min' => ':attribute tidak boleh kurang dari :min.',
+      'max' => ':attribute maksimal :max karakter.',
+      'unique' => ':attribute sudah dipakai.',
+      'exists' => ':attribute tidak valid.',
+      'in' => ':attribute tidak valid.',
+    ];
+  }
+
+  protected function namaAtributItem(): array
+  {
+    return [
+      'mode' => 'Mode input',
+      'katalog_item_id' => 'Item pekerjaan',
+      'kode_designator' => 'Kode designator',
+      'kategori_pekerjaan' => 'Kategori pekerjaan',
+      'uraian_pekerjaan' => 'Uraian pekerjaan',
+      'satuan' => 'Satuan',
+      'qty_drm' => 'Quantity DRM',
+      'qty_rekon_aktual' => 'Quantity Rekon/Aktual',
+      'qty_tambah' => 'Quantity Tambah',
+      'qty_kurang' => 'Quantity Kurang',
+      'kategori_foto' => 'Kategori foto',
+    ];
+  }
+
   public function create(Proyek $proyek)
   {
     Gate::authorize('update', $proyek);
@@ -46,7 +78,7 @@ class ItemProyekController extends Controller
       'qty_tambah' => ['required', 'integer', 'min:0'],
       'qty_kurang' => ['required', 'integer', 'min:0'],
       'kategori_foto' => ['required', 'in:representatif,wajib_per_unit'],
-    ]);
+    ], $this->pesanItem(), $this->namaAtributItem());
 
     if ($validated['mode'] === 'baru') {
       $katalogItem = KatalogItem::create([
@@ -77,6 +109,54 @@ class ItemProyekController extends Controller
       ->with('status', 'Item berhasil ditambahkan. Sekarang upload foto buktinya.');
   }
 
+  public function edit(Proyek $proyek, ItemProyek $itemProyek)
+  {
+    Gate::authorize('update', $proyek);
+    $this->pastikanItemMilikProyek($proyek, $itemProyek);
+
+    $katalogItems = KatalogItem::orderBy('uraian_pekerjaan')->get();
+    $fotoAda = $itemProyek->fotoBukti()->count();
+
+    return view('proyek.item.edit', compact('proyek', 'itemProyek', 'katalogItems', 'fotoAda'));
+  }
+
+  public function update(Request $request, Proyek $proyek, ItemProyek $itemProyek)
+  {
+    Gate::authorize('update', $proyek);
+    $this->pastikanItemMilikProyek($proyek, $itemProyek);
+
+    $validated = $request->validate([
+      'katalog_item_id' => ['required', 'exists:katalog_item,id'],
+      'qty_drm' => ['required', 'integer', 'min:0'],
+      'qty_rekon_aktual' => ['required', 'integer', 'min:0'],
+      'qty_tambah' => ['required', 'integer', 'min:0'],
+      'qty_kurang' => ['required', 'integer', 'min:0'],
+      'kategori_foto' => ['required', 'in:representatif,wajib_per_unit'],
+    ], $this->pesanItem(), $this->namaAtributItem());
+
+    // Jumlah foto wajib baru mengikuti kategori dan quantity yang baru.
+    // Kalau foto yang sudah ada lebih banyak dari itu, perubahan ditolak supaya
+    // pengguna sendiri yang memilih foto mana yang dihapus (tidak ada yang hilang otomatis).
+    $wajibBaru = $validated['kategori_foto'] === 'representatif'
+      ? 1
+      : (int) $validated['qty_rekon_aktual'];
+    $fotoAda = $itemProyek->fotoBukti()->count();
+
+    if ($fotoAda > $wajibBaru) {
+      $kelebihan = $fotoAda - $wajibBaru;
+
+      return back()->withInput()->withErrors([
+        'jumlah_foto' => 'Item ini sudah memiliki ' . $fotoAda . ' foto, sedangkan pengaturan baru hanya meminta '
+          . $wajibBaru . ' foto. Hapus ' . $kelebihan . ' foto dulu di halaman upload foto, lalu ulangi perubahan ini.',
+      ]);
+    }
+
+    $itemProyek->update($validated);
+
+    return redirect()->route('proyek.show', $proyek)
+      ->with('status', 'Item berhasil diperbarui.');
+  }
+
   public function upload(Proyek $proyek, ItemProyek $itemProyek)
   {
     Gate::authorize('update', $proyek);
@@ -93,16 +173,32 @@ class ItemProyekController extends Controller
     $this->pastikanItemMilikProyek($proyek, $itemProyek);
 
     $request->validate([
-      'foto' => ['required', 'array'],
+      'foto' => ['required', 'array', 'min:1'],
       'foto.*' => ['image', 'max:5120'],
+    ], [
+      'foto.required' => 'Pilih minimal satu foto untuk diupload.',
+      'foto.array' => 'Data foto tidak valid. Coba pilih ulang fotonya.',
+      'foto.min' => 'Pilih minimal satu foto untuk diupload.',
+      'foto.*.image' => 'Foto ke-:position bukan file gambar yang valid (gunakan JPG, PNG, atau WEBP).',
+      'foto.*.max' => 'Foto ke-:position melebihi batas ukuran 5 MB.',
+      'foto.*.uploaded' => 'Foto ke-:position gagal diunggah. Ukurannya mungkin melebihi batas server, coba kurangi ukuran atau jumlah fotonya.',
     ]);
 
-    $sisaSlot = $itemProyek->jumlah_foto_wajib - $itemProyek->fotoBukti()->count();
-    $fotoBaru = array_slice($request->file('foto'), 0, max($sisaSlot, 0));
+    $sisaSlot = max($itemProyek->jumlah_foto_wajib - $itemProyek->fotoBukti()->count(), 0);
+    $files = $request->file('foto');
+
+    // Seluruh unggahan ditolak kalau melebihi slot, supaya tidak ada foto yang dibuang diam-diam
+    if (count($files) > $sisaSlot) {
+      $pesan = $sisaSlot === 0
+        ? 'Semua slot foto untuk item ini sudah terisi. Hapus foto lama dulu kalau ingin menggantinya.'
+        : 'Kamu memilih ' . count($files) . ' foto, tetapi slot yang tersisa hanya ' . $sisaSlot . '. Kurangi pilihan fotonya lalu coba lagi.';
+
+      return back()->withErrors(['foto' => $pesan]);
+    }
 
     $nomorUrut = $itemProyek->fotoBukti()->max('nomor_urut') ?? 0;
 
-    foreach ($fotoBaru as $file) {
+    foreach ($files as $file) {
       $path = $file->store('foto-bukti/' . $proyek->id . '/' . $itemProyek->id, 'public');
       $nomorUrut++;
 

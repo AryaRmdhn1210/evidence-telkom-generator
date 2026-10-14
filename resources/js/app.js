@@ -37,6 +37,49 @@ Alpine.data('confirmModal', (tones) => ({
     },
 }));
 
+// Form edit item proyek: data awal dibaca dari atribut data-config (disiapkan Blade),
+// bukan dari skrip inline, supaya tidak ada ekspresi Blade di dalam JavaScript.
+Alpine.data('itemEditForm', () => ({
+    items: [],
+    itemModalOpen: false,
+    itemSearch: '',
+    selectedItemId: '',
+    drm: 0,
+    rekon: 0,
+    tambah: 0,
+    kurang: 0,
+    kategori: 'wajib_per_unit',
+    fotoAda: 0,
+    init() {
+        Object.assign(this, JSON.parse(this.$el.dataset.config || '{}'));
+    },
+    get selectedItem() {
+        return this.items.find(i => i.id == this.selectedItemId);
+    },
+    get filteredItems() {
+        const q = this.itemSearch.toLowerCase();
+        if (!q) return this.items;
+        return this.items.filter(i => (i.kode_designator + ' ' + i.uraian_pekerjaan + ' ' + (i.kategori_pekerjaan || '')).toLowerCase().includes(q));
+    },
+    selectItem(item) {
+        this.selectedItemId = item.id;
+        this.itemModalOpen = false;
+        this.itemSearch = '';
+    },
+    get hasilHitung() {
+        return Number(this.drm) + Number(this.tambah) - Number(this.kurang);
+    },
+    get sesuai() {
+        return this.hasilHitung === Number(this.rekon);
+    },
+    get jumlahFotoWajib() {
+        return this.kategori === 'representatif' ? 1 : Number(this.rekon || 0);
+    },
+    get fotoKelebihan() {
+        return Math.max(this.fotoAda - this.jumlahFotoWajib, 0);
+    },
+}));
+
 Alpine.start();
 
 // Form dengan atribut data-confirm ditahan dulu, lalu modal konfirmasi ditampilkan
