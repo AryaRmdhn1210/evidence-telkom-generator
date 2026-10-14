@@ -15,9 +15,17 @@ class ProyekController extends Controller
   public function index(Request $request)
   {
     $search = $request->get('search');
+    $status = $request->query('status');
+    if (!in_array($status, Proyek::STATUS_FOTO, true)) {
+      $status = null;
+    }
     $perPage = $this->perHalaman($request);
 
-    $proyeks = Proyek::with('pembuat')
+    $proyeks = Proyek::with([
+      'pembuat',
+      'itemProyek' => fn($q) => $q->withCount('fotoBukti'),
+    ])
+      ->withCount('laporan')
       ->when($search, function ($q) use ($search) {
         $q->where(function ($q) use ($search) {
           $q->where('nama_proyek', 'like', "%{$search}%")
@@ -26,11 +34,12 @@ class ProyekController extends Controller
             ->orWhere('sto', 'like', "%{$search}%");
         });
       })
+      ->when($status, fn($q) => $q->statusFoto($status))
       ->latest()
       ->paginate($perPage)
       ->withQueryString();
 
-    return view('proyek.index', compact('proyeks', 'search', 'perPage'));
+    return view('proyek.index', compact('proyeks', 'search', 'status', 'perPage'));
   }
 
   public function show(Proyek $proyek)
