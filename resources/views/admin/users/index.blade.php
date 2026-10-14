@@ -11,9 +11,16 @@
             <x-flash-message />
 
             <div class="flex flex-col gap-3 mb-4 sm:flex-row sm:items-center sm:justify-between">
-                <form method="GET" class="flex-1 max-w-sm">
+                <form method="GET" class="flex items-center flex-1 max-w-md gap-2">
                     <input type="text" name="search" value="{{ $search }}" placeholder="Cari nama, username, atau email..."
-                        class="w-full text-sm border-gray-300 rounded" onchange="this.form.submit()">
+                        class="w-full text-sm border-gray-300 rounded">
+                    <button type="submit"
+                        class="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50">
+                        Cari
+                    </button>
+                    @if ($search)
+                    <a href="{{ route('admin.users.index') }}" class="text-sm text-gray-600 hover:underline">Reset</a>
+                    @endif
                 </form>
                 <a href="{{ route('admin.users.create') }}"
                     class="px-4 py-2 text-sm text-center text-white bg-red-600 rounded hover:bg-red-700">
