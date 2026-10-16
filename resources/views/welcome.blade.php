@@ -9,6 +9,35 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <style>
+        /* Transisi antar halaman (landing <-> login): logo dan nama sistem di header
+           bergeser mulus ke posisinya di halaman login. Browser yang belum mendukung
+           mengabaikan aturan ini dan berpindah halaman seperti biasa. */
+        @view-transition {
+            navigation: auto;
+        }
+
+        ::view-transition-group(brand-logo),
+        ::view-transition-group(brand-name) {
+            animation-duration: 0.6s;
+            animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        ::view-transition-old(root),
+        ::view-transition-new(root) {
+            animation-duration: 0.4s;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+
+            ::view-transition-group(*),
+            ::view-transition-old(*),
+            ::view-transition-new(*) {
+                animation: none !important;
+            }
+        }
+    </style>
 </head>
 
 @php
@@ -50,9 +79,11 @@ $peran = [
     <header class="sticky top-0 z-50 border-b border-red-100 shadow-sm bg-white/90 backdrop-blur">
         <div class="flex items-center justify-between h-16 px-4 sm:px-8 lg:px-12">
             <div class="flex items-center gap-3">
-                <img src="{{ $logo }}" alt="PT Telkom Akses" class="w-auto h-8 mix-blend-multiply">
+                <img src="{{ $logo }}" alt="PT Telkom Akses" class="w-auto h-8 mix-blend-multiply"
+                    style="view-transition-name: brand-logo;">
                 <span class="hidden w-px h-6 bg-gray-300 sm:block"></span>
-                <span class="text-sm font-semibold text-gray-800 sm:text-base">Evidence Telkom Generator</span>
+                <span class="text-sm font-semibold text-gray-800 sm:text-base"
+                    style="view-transition-name: brand-name;">Evidence Telkom Generator</span>
             </div>
 
             <a href="{{ route('login') }}"
