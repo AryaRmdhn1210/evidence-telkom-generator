@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\Laporan;
 use App\Models\Proyek;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -23,6 +24,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Nama bulan dan waktu relatif ("3 minggu yang lalu") mengikuti APP_LOCALE di .env
+        Carbon::setLocale(config('app.locale'));
+
         // Data aktivitas terbaru untuk sidebar (muncul di semua halaman)
         View::composer('layouts.sidebar', function ($view) {
             $user = Auth::user();
