@@ -1,3 +1,8 @@
+@php
+// Data pilihan witel untuk dropdown: nama (yang disimpan) + jenis (keterangan saja)
+$witelOpsi = collect(\App\Models\Proyek::DAFTAR_WITEL)->map(fn ($jenis, $nama) => ['nama' => $nama, 'jenis' => $jenis])->values();
+@endphp
+
 <div class="mb-4">
     <label class="block text-sm font-medium text-gray-700">Nama Proyek</label>
     <input type="text" name="nama_proyek" value="{{ old('nama_proyek', $proyek->nama_proyek ?? '') }}"
@@ -20,12 +25,75 @@
 </div>
 
 <div class="grid grid-cols-3 gap-3 mb-4">
-    <div>
+    <!-- Witel: dropdown modal pencarian (13 wilayah administrasi Kalsel) -->
+    <div x-data="{
+            open: false,
+            search: '',
+            selected: @js(old('witel', $proyek->witel ?? '')),
+            options: @js($witelOpsi),
+            get filtered() {
+                const q = this.search.toLowerCase();
+                return q ? this.options.filter(o => (o.nama + ' ' + o.jenis).toLowerCase().includes(q)) : this.options;
+            },
+            isSelected(o) { return this.selected.toLowerCase() === o.nama.toLowerCase(); },
+            pick(o) { this.selected = o.nama; this.open = false; this.search = ''; }
+        }"
+        @keydown.escape.window="open = false">
         <label class="block text-sm font-medium text-gray-700">Witel</label>
-        <input type="text" name="witel" value="{{ old('witel', $proyek->witel ?? '') }}"
-            class="block w-full mt-1 border-gray-300 rounded">
+        <button type="button" @click="open = true"
+            class="flex items-center justify-between w-full px-3 py-2 mt-1 text-left bg-white border border-gray-300 rounded hover:border-red-400">
+            <span class="truncate" x-text="selected || '-- Pilih Witel --'"
+                :class="selected ? 'text-gray-800' : 'text-gray-400'"></span>
+            <svg class="w-4 h-4 ml-2 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+        </button>
+        <input type="hidden" name="witel" :value="selected">
         @error('witel') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+
+        <!-- Modal pemilih witel -->
+        <div x-show="open" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div x-show="open"
+                x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100"
+                x-transition:leave="transition ease-in duration-150"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0"
+                class="absolute inset-0 bg-black/30 backdrop-blur-sm"
+                @click="open = false"></div>
+
+            <div x-show="open"
+                x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0 scale-95"
+                x-transition:enter-end="opacity-100 scale-100"
+                x-transition:leave="transition ease-in duration-150"
+                x-transition:leave-start="opacity-100 scale-100"
+                x-transition:leave-end="opacity-0 scale-95"
+                class="relative bg-white/80 backdrop-blur-xl border border-white/60 rounded-2xl shadow-xl w-full max-w-sm max-h-[70vh] flex flex-col">
+                <div class="p-5 border-b border-white/60">
+                    <h3 class="mb-2 font-semibold text-gray-800">Pilih Witel</h3>
+                    <input type="text" x-model="search" placeholder="Cari kabupaten atau kota..."
+                        class="w-full text-sm border-gray-300 rounded-lg focus:border-red-400 focus:ring-red-400">
+                </div>
+                <div class="flex-1 overflow-y-auto">
+                    <template x-for="o in filtered" :key="o.nama">
+                        <button type="button" @click="pick(o)"
+                            class="flex flex-col w-full px-5 py-3 text-left transition-colors border-b border-white/60 hover:bg-red-50/80"
+                            :class="isSelected(o) ? 'bg-red-50/80' : ''">
+                            <span class="text-sm font-medium text-gray-800" x-text="o.nama"></span>
+                            <span class="text-xs text-gray-500" x-text="o.jenis + ' · Kalimantan Selatan'"></span>
+                        </button>
+                    </template>
+                    <p x-show="filtered.length === 0" class="px-5 py-6 text-sm text-center text-gray-400">Tidak ada wilayah yang cocok.</p>
+                </div>
+                <div class="p-3 text-right border-t border-white/60">
+                    <button type="button" @click="open = false" class="px-3 py-1.5 text-sm rounded-lg border border-gray-300 hover:bg-white">Tutup</button>
+                </div>
+            </div>
+        </div>
     </div>
+
     <div>
         <label class="block text-sm font-medium text-gray-700">Lokasi</label>
         <input type="text" name="lokasi" value="{{ old('lokasi', $proyek->lokasi ?? '') }}"

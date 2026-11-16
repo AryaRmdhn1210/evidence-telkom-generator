@@ -16,6 +16,27 @@ class Proyek extends Model
     /** Kode status progres foto yang bisa dipakai sebagai filter di Daftar Proyek */
     public const STATUS_FOTO = ['belum_ada_item', 'belum_lengkap', 'siap_generate', 'sudah_generate'];
 
+    /**
+     * 13 wilayah administrasi Provinsi Kalimantan Selatan.
+     * Kunci = nama (huruf kapital) yang disimpan di kolom witel dan tercetak di laporan.
+     * Nilai = jenis wilayah, hanya untuk keterangan di dropdown form.
+     */
+    public const DAFTAR_WITEL = [
+        'TANAH LAUT' => 'Kabupaten',
+        'KOTABARU' => 'Kabupaten',
+        'BANJAR' => 'Kabupaten',
+        'BARITO KUALA' => 'Kabupaten',
+        'TAPIN' => 'Kabupaten',
+        'HULU SUNGAI SELATAN' => 'Kabupaten',
+        'HULU SUNGAI TENGAH' => 'Kabupaten',
+        'HULU SUNGAI UTARA' => 'Kabupaten',
+        'TABALONG' => 'Kabupaten',
+        'TANAH BUMBU' => 'Kabupaten',
+        'BALANGAN' => 'Kabupaten',
+        'BANJARMASIN' => 'Kota',
+        'BANJARBARU' => 'Kota',
+    ];
+
     protected $table = 'proyek';
 
     protected $fillable = [
