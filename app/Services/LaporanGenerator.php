@@ -233,8 +233,9 @@ class LaporanGenerator
     }
 
     $section->addTextBreak(1);
+    // Witel dan tanggal (termasuk nama bulan) dicetak huruf kapital semua
     $section->addText(
-      strtoupper($proyek->witel) . ', ' . Carbon::parse($tanggal)->translatedFormat('d F Y'),
+      mb_strtoupper($proyek->witel . ', ' . Carbon::parse($tanggal)->translatedFormat('d F Y')),
       ['size' => 11],
       ['alignment' => Jc::END]
     );

@@ -195,8 +195,9 @@
     </tbody>
   </table>
 
+  {{-- Witel dan tanggal (termasuk nama bulan) dicetak huruf kapital semua --}}
   <p style="text-align: right; margin-top: 20px;">
-    {{ strtoupper($proyek->witel) }}, {{ \Carbon\Carbon::parse($tanggalUjiTerima)->translatedFormat('d F Y') }}
+    {{ mb_strtoupper($proyek->witel . ', ' . \Carbon\Carbon::parse($tanggalUjiTerima)->translatedFormat('d F Y')) }}
   </p>
 
   <table class="signature-table">
