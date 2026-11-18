@@ -33,9 +33,12 @@ $sisaSlot = max($itemProyek->jumlah_foto_wajib - $itemProyek->fotoBukti->count()
           @foreach ($itemProyek->fotoBukti as $foto)
           <div class="relative group">
             <img src="{{ asset('storage/' . $foto->file_path) }}" class="object-cover w-full rounded aspect-square">
+            @if ($itemProyek->kategori_foto === 'wajib_per_unit')
+            <span class="absolute bottom-1 left-1 px-1.5 py-0.5 text-[11px] font-semibold text-white rounded bg-black/60">{{ $loop->iteration }}</span>
+            @endif
             <form action="{{ route('proyek.item.foto.destroy', [$proyek, $itemProyek, $foto]) }}" method="POST"
               class="absolute top-1 right-1"
-              data-confirm="Hapus foto nomor {{ $foto->nomor_urut }} dari item {{ $itemProyek->katalogItem->kode_designator }}?"
+              data-confirm="Hapus foto nomor {{ $loop->iteration }} dari item {{ $itemProyek->katalogItem->kode_designator }}?"
               data-confirm-title="Hapus Foto"
               data-confirm-button="Ya, hapus foto">
               @csrf

@@ -93,7 +93,8 @@ class ItemProyekController extends Controller
       $katalogItemId = $validated['katalog_item_id'];
     }
 
-    $urutan = $proyek->itemProyek()->count() + 1;
+    // Urutan terbesar + 1, bukan jumlah item + 1, supaya tidak ada urutan kembar setelah item dihapus
+    $urutan = ($proyek->itemProyek()->max('urutan_item') ?? 0) + 1;
 
     $itemProyek = $proyek->itemProyek()->create([
       'katalog_item_id' => $katalogItemId,
@@ -162,7 +163,11 @@ class ItemProyekController extends Controller
     Gate::authorize('update', $proyek);
     $this->pastikanItemMilikProyek($proyek, $itemProyek);
 
-    $itemProyek->load('katalogItem', 'fotoBukti');
+    // Foto diurutkan sama seperti di laporan, supaya nomor di halaman ini cocok dengan nomor di laporan
+    $itemProyek->load([
+      'katalogItem',
+      'fotoBukti' => fn($q) => $q->orderBy('nomor_urut'),
+    ]);
 
     return view('proyek.item.upload', compact('proyek', 'itemProyek'));
   }
